@@ -1,20 +1,20 @@
-import { useLoader } from '@react-three/fiber';
-import React, { Children } from 'react';
-import { TextureLoader } from 'three';
-import * as THREE from 'three';
+import { useLoader } from "@react-three/fiber";
+import React, { Children } from "react";
+import { TextureLoader } from "three";
+import * as THREE from "three";
 
 type Props = {
-  children?: React.ReactNode;
+  children?: React.ReactNode[];
 };
 
 const Room = (props: Props) => {
   const repeat = 5;
   const plaster = useLoader(TextureLoader, [
-    'textures/concrete/Concrete_017_basecolor.jpg',
-    'textures/concrete/Concrete_017_height.png',
-    'textures/concrete/Concrete_017_normal.jpg',
-    'textures/concrete/Concrete_017_roughness.jpg',
-    'textures/concrete/Concrete_017_ambientOcclusion.jpg',
+    "textures/concrete/Concrete_017_basecolor.jpg",
+    "textures/concrete/Concrete_017_height.png",
+    "textures/concrete/Concrete_017_normal.jpg",
+    "textures/concrete/Concrete_017_roughness.jpg",
+    "textures/concrete/Concrete_017_ambientOcclusion.jpg",
   ]);
   plaster.map((item) => {
     item.wrapS = THREE.RepeatWrapping;
@@ -22,11 +22,11 @@ const Room = (props: Props) => {
     item.repeat.set(repeat, repeat);
   });
   const wood = useLoader(TextureLoader, [
-    'textures/wood/Wood_020_basecolor.jpg',
-    'textures/wood/Wood_020_height.png',
-    'textures/wood/Wood_020_normal.jpg',
-    'textures/wood/Wood_020_roughness.jpg',
-    'textures/wood/Wood_020_ambientOcclusion.jpg',
+    "textures/wood/Wood_020_basecolor.jpg",
+    "textures/wood/Wood_020_height.png",
+    "textures/wood/Wood_020_normal.jpg",
+    "textures/wood/Wood_020_roughness.jpg",
+    "textures/wood/Wood_020_ambientOcclusion.jpg",
   ]);
   wood.map((item) => {
     item.wrapS = THREE.RepeatWrapping;
@@ -35,7 +35,10 @@ const Room = (props: Props) => {
   });
   return (
     <group>
-      <mesh position={[0, 0, 100]}>{props.children}</mesh>
+      {props.children &&
+        props.children.map((item) => (
+          <mesh position={[0, 0, 100]}>{item}</mesh>
+        ))}
       <mesh receiveShadow position={[0, 250, 0]} rotation={[0, 0, 0]}>
         <planeGeometry args={[1000, 500]} />
 

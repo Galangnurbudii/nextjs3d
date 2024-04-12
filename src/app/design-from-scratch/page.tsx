@@ -1,98 +1,102 @@
-'use client';
+"use client";
 
-import { OrbitControls } from '@react-three/drei';
-import { Canvas } from '@react-three/fiber';
-import * as THREE from 'three';
-import { Model } from '@/components/Base6';
-import Room from '@/components/Room';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { useState } from 'react';
-import Environments from '@/components/Environments';
+import { OrbitControls } from "@react-three/drei";
+import { Canvas } from "@react-three/fiber";
+import * as THREE from "three";
+import { Model, base6Metadata } from "@/components/Base6";
+import Room from "@/components/Room";
+
+import { useEffect, useRef, useState } from "react";
+import Environments from "@/components/Environments";
+import { AspectRatio } from "@radix-ui/react-aspect-ratio";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import Image from "next/image";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Home() {
-  const [pintu, setPintu] = useState<string>('');
-  const [handle, setHandle] = useState<string>('');
-  const [isian, setIsian] = useState<string>('');
-  const [kaki, setKaki] = useState<string>('');
+  // const [model, setModel] = useState<any[]>([]);
+  const insertObject = () => {};
+  const model = [<Model />];
+  useEffect(() => {
+    console.log(model[0].props);
+  });
 
   return (
-    <div className='h-screen'>
-      <div className='absolute z-10 flex p-4 justify-center gap-4'>
-        <Select
-          onValueChange={(e) => {
-            setPintu(e);
-          }}
-        >
-          <SelectTrigger className='w-[180px]'>
-            <SelectValue placeholder='Pintu' />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value='pintu1'>Pintu 1</SelectItem>
-            <SelectItem value='pintu2'>Pintu 2</SelectItem>
-            <SelectItem value='pintu3'>Pintu 3</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select
-          onValueChange={(e) => {
-            setHandle(e);
-          }}
-        >
-          <SelectTrigger className='w-[180px]'>
-            <SelectValue placeholder='Handle' />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value='Handle_2_1'>Handle 1</SelectItem>
-            <SelectItem value='Handle_4_1'>Handle 2</SelectItem>
-            <SelectItem value='Handle_3_1'>Handle 3</SelectItem>
-            <SelectItem value='Handle_5__knob_1'>Handle 4</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select
-          onValueChange={(e) => {
-            setIsian(e);
-          }}
-        >
-          <SelectTrigger className='w-[180px]'>
-            <SelectValue placeholder='Isian' />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value='Appliances_2_1'>Isian 1</SelectItem>
-            <SelectItem value='Ambalan_1_1'>Isian 2</SelectItem>
-            <SelectItem value='Ambalan_2_1'>Isian 3</SelectItem>
-            <SelectItem value='Appliances_1_1'>Isian 4</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select
-          onValueChange={(e) => {
-            setKaki(e);
-          }}
-        >
-          <SelectTrigger className='w-[180px]'>
-            <SelectValue placeholder='Kaki' />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value='CB8_1'>Kaki 1</SelectItem>
-            <SelectItem value='CB2_1'>Kaki 2</SelectItem>
-            <SelectItem value='CB1_1'>Kaki 3</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <Canvas camera={{ position: [0, 100, 200], fov: 90, far: 10000 }} shadows>
-        {/* <axesHelper args={[200]} /> */}
-        <color attach='background' args={['lightpink']} />
-        <Room>
-          <Model pintu={pintu} handle={handle} isian={isian} kaki={kaki} />
-        </Room>
+    <div className="min-h-screen p-4">
+      <div className="flex">
+        <div className="w-3/4">
+          <AspectRatio ratio={16 / 9}>
+            <Canvas
+              className="border rounded-lg"
+              camera={{ position: [0, 100, 200], fov: 90, far: 10000 }}
+              shadows
+            >
+              {/* <axesHelper args={[200]} /> */}
+              <color attach="background" args={["black"]} />
+              <Room>{model}</Room>
 
-        <Environments direction={[250, 300, 500]} />
-        <OrbitControls />
-      </Canvas>
+              <Environments direction={[250, 300, 500]} />
+              <OrbitControls />
+            </Canvas>
+          </AspectRatio>
+        </div>
+        <div className="w-1/4">
+          <p className="font-bold text-center text-2xl mb-4">
+            Select Furniture
+          </p>
+          <div className="flex">
+            <div className="m-2 w-1/2 hover:cursor-pointer">
+              <Card>
+                <CardContent className="relative h-56">
+                  <Image alt="cabinet" fill src={"/cabinet.webp"} />
+                </CardContent>
+                <CardFooter>
+                  <p>Product Description</p>
+                </CardFooter>
+              </Card>
+            </div>
+            <div className="m-2 w-1/2">
+              <Card>
+                <CardContent className="relative h-56">
+                  <Image alt="cabinet" fill src={"/cabinet.webp"} />
+                </CardContent>
+                <CardFooter>
+                  <p>Product Description</p>
+                </CardFooter>
+              </Card>
+            </div>
+          </div>
+
+          <Tabs
+            className="p-4 w-full"
+            defaultValue={Object.keys(base6Metadata)[0]}
+          >
+            <TabsList
+              className={`grid w-full grid-cols-${
+                Object.keys(base6Metadata).length
+              }`}
+            >
+              {Object.keys(base6Metadata).map((item) => (
+                <TabsTrigger value={item}>{item}</TabsTrigger>
+              ))}
+            </TabsList>
+            {Object.keys(base6Metadata).map((item1, index) => (
+              <TabsContent value={item1}>
+                <div className="grid grid-cols-2 h-48">
+                  {Object.values(base6Metadata)[index].map((item2) => (
+                    <Card
+                      className="m-2 hover:cursor-pointer"
+                      onClick={() => {}}
+                    >
+                      <CardContent>{item2}</CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </TabsContent>
+            ))}
+          </Tabs>
+        </div>
+      </div>
     </div>
   );
 }
