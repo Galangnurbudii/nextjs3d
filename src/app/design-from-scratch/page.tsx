@@ -1,38 +1,42 @@
-"use client";
+'use client';
 
-import { OrbitControls } from "@react-three/drei";
-import { Canvas } from "@react-three/fiber";
-import * as THREE from "three";
-import { Model, base6Metadata } from "@/components/Base6";
-import Room from "@/components/Room";
+import { OrbitControls } from '@react-three/drei';
+import { Canvas } from '@react-three/fiber';
+import * as THREE from 'three';
+import { Model, base6Metadata } from '@/components/Base6';
+import Room from '@/components/Room';
 
-import { useEffect, useRef, useState } from "react";
-import Environments from "@/components/Environments";
-import { AspectRatio } from "@radix-ui/react-aspect-ratio";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import Image from "next/image";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useEffect, useRef, useState } from 'react';
+import Environments from '@/components/Environments';
+import { AspectRatio } from '@radix-ui/react-aspect-ratio';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import Image from 'next/image';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function Home() {
-  // const [model, setModel] = useState<any[]>([]);
-  const insertObject = () => {};
-  const model = [<Model />];
+  const [custom, setCustom] = useState({
+    pintu: '',
+    kaki: '',
+    isian: '',
+    handle: '',
+  });
+  const model = [<Model key='test' {...custom} />];
   useEffect(() => {
     console.log(model[0].props);
   });
 
   return (
-    <div className="min-h-screen p-4">
-      <div className="flex">
-        <div className="w-3/4">
+    <div className='min-h-screen p-4'>
+      <div className='flex'>
+        <div className='w-3/4'>
           <AspectRatio ratio={16 / 9}>
             <Canvas
-              className="border rounded-lg"
+              className='border rounded-lg'
               camera={{ position: [0, 100, 200], fov: 90, far: 10000 }}
               shadows
             >
               {/* <axesHelper args={[200]} /> */}
-              <color attach="background" args={["black"]} />
+              <color attach='background' args={['black']} />
               <Room>{model}</Room>
 
               <Environments direction={[250, 300, 500]} />
@@ -40,25 +44,25 @@ export default function Home() {
             </Canvas>
           </AspectRatio>
         </div>
-        <div className="w-1/4">
-          <p className="font-bold text-center text-2xl mb-4">
+        <div className='w-1/4'>
+          <p className='font-bold text-center text-2xl mb-4'>
             Select Furniture
           </p>
-          <div className="flex">
-            <div className="m-2 w-1/2 hover:cursor-pointer">
+          <div className='flex'>
+            <div className='m-2 w-1/2 hover:cursor-pointer'>
               <Card>
-                <CardContent className="relative h-56">
-                  <Image alt="cabinet" fill src={"/cabinet.webp"} />
+                <CardContent className='relative h-56'>
+                  <Image alt='cabinet' fill src={'/cabinet.webp'} />
                 </CardContent>
                 <CardFooter>
                   <p>Product Description</p>
                 </CardFooter>
               </Card>
             </div>
-            <div className="m-2 w-1/2">
+            <div className='m-2 w-1/2'>
               <Card>
-                <CardContent className="relative h-56">
-                  <Image alt="cabinet" fill src={"/cabinet.webp"} />
+                <CardContent className='relative h-56'>
+                  <Image alt='cabinet' fill src={'/cabinet.webp'} />
                 </CardContent>
                 <CardFooter>
                   <p>Product Description</p>
@@ -68,7 +72,7 @@ export default function Home() {
           </div>
 
           <Tabs
-            className="p-4 w-full"
+            className='p-4 w-full'
             defaultValue={Object.keys(base6Metadata)[0]}
           >
             <TabsList
@@ -77,20 +81,34 @@ export default function Home() {
               }`}
             >
               {Object.keys(base6Metadata).map((item) => (
-                <TabsTrigger value={item}>{item}</TabsTrigger>
+                <TabsTrigger key='trigger' value={item}>
+                  {item}
+                </TabsTrigger>
               ))}
             </TabsList>
             {Object.keys(base6Metadata).map((item1, index) => (
-              <TabsContent value={item1}>
-                <div className="grid grid-cols-2 h-48">
+              <TabsContent key={'content'} value={item1}>
+                <div className='grid grid-cols-2 h-48'>
                   {Object.values(base6Metadata)[index].map((item2) => (
                     <Card
-                      className="m-2 hover:cursor-pointer"
-                      onClick={() => {}}
+                      key={'card'}
+                      className='m-2 hover:cursor-pointer'
+                      onClick={() =>
+                        setCustom((prev) => ({ ...prev, [item1]: item2 }))
+                      }
                     >
                       <CardContent>{item2}</CardContent>
                     </Card>
                   ))}
+                  <Card
+                    key={'cardKosong'}
+                    className='m-2 hover:cursor-pointer'
+                    onClick={() =>
+                      setCustom((prev) => ({ ...prev, [item1]: '' }))
+                    }
+                  >
+                    <CardContent>Kosong</CardContent>
+                  </Card>
                 </div>
               </TabsContent>
             ))}
