@@ -8,7 +8,7 @@ import Room from '@/components/Room';
 
 import { useEffect, useRef, useState } from 'react';
 import Environments from '@/components/Environments';
-import { AspectRatio } from '@radix-ui/react-aspect-ratio';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import Image from 'next/image';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -75,11 +75,7 @@ export default function Home() {
             className='p-4 w-full'
             defaultValue={Object.keys(base6Metadata)[0]}
           >
-            <TabsList
-              className={`grid w-full grid-cols-${
-                Object.keys(base6Metadata).length
-              }`}
-            >
+            <TabsList className={`grid w-full grid-cols-4`}>
               {Object.keys(base6Metadata).map((item) => (
                 <TabsTrigger key='trigger' value={item}>
                   {item}
