@@ -1,5 +1,6 @@
+import { Select } from '@react-three/drei';
 import { useLoader } from '@react-three/fiber';
-import React, { Children } from 'react';
+import React, { Children, useEffect, useState } from 'react';
 import { TextureLoader } from 'three';
 import * as THREE from 'three';
 
@@ -33,14 +34,24 @@ const Room = (props: Props) => {
     item.wrapT = THREE.RepeatWrapping;
     item.repeat.set(repeat, repeat);
   });
+
+  const [selected, setSelected] = useState<any[]>([]);
+
+  useEffect(() => {
+    console.log(selected);
+  }, [selected]);
+
   return (
+    
     <group>
-      {props.children &&
-        props.children.map((item, index) => (
-          <mesh key={'mesh' + index} position={[0, 0, 100]}>
-            {item}
-          </mesh>
-        ))}
+      <Select box onChange={setSelected} filter={(items) => items}>
+        {props.children &&
+          props.children.map((item, index) => (
+            <mesh key={'mesh' + index} position={[0 + index * 100, 0, 100]}>
+              {item}
+            </mesh>
+          ))}
+      </Select>
       <mesh receiveShadow position={[0, 250, 0]} rotation={[0, 0, 0]}>
         <planeGeometry args={[1000, 500]} />
 

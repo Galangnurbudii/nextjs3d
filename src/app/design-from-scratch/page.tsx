@@ -5,13 +5,17 @@ import { Canvas } from '@react-three/fiber';
 import * as THREE from 'three';
 import { Model, base6Metadata } from '@/components/Base6';
 import Room from '@/components/Room';
-
-import { useEffect, useRef, useState } from 'react';
+import { models } from '@/components/models';
+import React, { useEffect, useRef, useState } from 'react';
 import Environments from '@/components/Environments';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import Image from 'next/image';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  CustomizationProvider,
+  useCustomization,
+} from '../contexts/Customization';
 
 export default function Home() {
   const [custom, setCustom] = useState({
@@ -20,97 +24,109 @@ export default function Home() {
     isian: '',
     handle: '',
   });
-  const model = [<Model key='test' {...custom} />];
-  useEffect(() => {
-    console.log(model[0].props);
-  });
-
+  const [model, setModel] = useState<any[]>([]);
+  const { customization, updateCustomization } = useCustomization();
   return (
-    <div className='min-h-screen p-4'>
-      <div className='flex'>
-        <div className='w-3/4'>
-          <AspectRatio ratio={16 / 9}>
-            <Canvas
-              className='border rounded-lg'
-              camera={{ position: [0, 100, 200], fov: 90, far: 10000 }}
-              shadows
-            >
-              {/* <axesHelper args={[200]} /> */}
-              <color attach='background' args={['black']} />
-              <Room>{model}</Room>
+    <CustomizationProvider>
+      <div className='min-h-screen p-4'>
+        <div className='flex'>
+          <div className='w-3/4'>
+            <AspectRatio ratio={16 / 9}>
+              <Canvas
+                className='border rounded-lg'
+                camera={{ position: [0, 100, 200], fov: 90, far: 10000 }}
+                shadows
+              >
+                {/* <axesHelper args={[200]} /> */}
+                <color attach='background' args={['black']} />
+                <Room>{model}</Room>
 
-              <Environments direction={[250, 300, 500]} />
-              <OrbitControls />
-            </Canvas>
-          </AspectRatio>
-        </div>
-        <div className='w-1/4'>
-          <p className='font-bold text-center text-2xl mb-4'>
-            Select Furniture
-          </p>
-          <div className='flex'>
-            <div className='m-2 w-1/2 hover:cursor-pointer'>
-              <Card>
-                <CardContent className='relative h-56'>
-                  <Image alt='cabinet' fill src={'/cabinet.webp'} />
-                </CardContent>
-                <CardFooter>
-                  <p>Product Description</p>
-                </CardFooter>
-              </Card>
-            </div>
-            <div className='m-2 w-1/2'>
-              <Card>
-                <CardContent className='relative h-56'>
-                  <Image alt='cabinet' fill src={'/cabinet.webp'} />
-                </CardContent>
-                <CardFooter>
-                  <p>Product Description</p>
-                </CardFooter>
-              </Card>
-            </div>
+                <Environments direction={[250, 300, 500]} />
+                <OrbitControls />
+              </Canvas>
+            </AspectRatio>
           </div>
+          <div className='w-1/4'>
+            <p className='font-bold text-center text-2xl mb-4'>
+              Select Furniture
+            </p>
+            <div className='grid grid-cols-2 gap-4 p-4'>
+              {models.map((item, index) => (
+                <div
+                  className='hover:cursor-pointer'
+                  onClick={() => {
+                    updateCustomization(
+                      Object.fromEntries(
+                        Object.keys(item.metadata).map((key) => [key, ''])
+                      )
+                    );
+                    console.log(customization);
 
-          <Tabs
-            className='p-4 w-full'
-            defaultValue={Object.keys(base6Metadata)[0]}
-          >
-            <TabsList className={`grid w-full grid-cols-4`}>
-              {Object.keys(base6Metadata).map((item) => (
-                <TabsTrigger key='trigger' value={item}>
-                  {item}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-            {Object.keys(base6Metadata).map((item1, index) => (
-              <TabsContent key={'content'} value={item1}>
-                <div className='grid grid-cols-2 h-48'>
-                  {Object.values(base6Metadata)[index].map((item2) => (
-                    <Card
-                      key={'card'}
-                      className='m-2 hover:cursor-pointer'
-                      onClick={() =>
-                        setCustom((prev) => ({ ...prev, [item1]: item2 }))
-                      }
-                    >
-                      <CardContent>{item2}</CardContent>
-                    </Card>
-                  ))}
-                  <Card
-                    key={'cardKosong'}
-                    className='m-2 hover:cursor-pointer'
-                    onClick={() =>
-                      setCustom((prev) => ({ ...prev, [item1]: '' }))
-                    }
-                  >
-                    <CardContent>Kosong</CardContent>
+                    setModel((prev) => [
+                      ...prev,
+                      <item.Model
+                        key={'model' + prev.length}
+                        modelId={'model' + prev.length}
+                      />,
+                    ]);
+                  }}
+                  key={'catalog' + index}
+                >
+                  <Card>
+                    <CardContent className='relative h-56'>
+                      <Image alt='cabinet' fill src={'/cabinet.webp'} />
+                    </CardContent>
+                    <CardFooter>
+                      <p>Product Description</p>
+                    </CardFooter>
                   </Card>
                 </div>
-              </TabsContent>
-            ))}
-          </Tabs>
+              ))}
+            </div>
+
+            <Tabs
+              className='p-4 w-full'
+              defaultValue={Object.keys(base6Metadata)[0]}
+            >
+              <TabsList className={`grid w-full grid-cols-4`}>
+                {Object.keys(base6Metadata).map((item, index) => (
+                  <TabsTrigger key={'trigger' + index} value={item}>
+                    {item}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+              {Object.keys(base6Metadata).map((item1, index) => (
+                <TabsContent key={'content' + index} value={item1}>
+                  <div className='grid grid-cols-2 h-48'>
+                    {Object.values(base6Metadata)[index].map(
+                      (item2, index1) => (
+                        <Card
+                          key={'card' + index + index1}
+                          className='m-2 hover:cursor-pointer'
+                          onClick={() =>
+                            setCustom((prev) => ({ ...prev, [item1]: item2 }))
+                          }
+                        >
+                          <CardContent>{item2}</CardContent>
+                        </Card>
+                      )
+                    )}
+                    <Card
+                      key={'cardKosong'}
+                      className='m-2 hover:cursor-pointer'
+                      onClick={() =>
+                        setCustom((prev) => ({ ...prev, [item1]: '' }))
+                      }
+                    >
+                      <CardContent>Kosong</CardContent>
+                    </Card>
+                  </div>
+                </TabsContent>
+              ))}
+            </Tabs>
+          </div>
         </div>
       </div>
-    </div>
+    </CustomizationProvider>
   );
 }
