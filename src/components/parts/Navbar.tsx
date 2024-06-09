@@ -3,7 +3,7 @@ import React from "react";
 
 const Navbar = () => {
   return (
-    <div className="h-28 flex items-center justify-center bg-transparent">
+    <div className="h-28 flex items-center justify-center bg-neutral-100">
       <Image src="/images/logo.png" width={80} height={80} alt="logo" />
     </div>
   );

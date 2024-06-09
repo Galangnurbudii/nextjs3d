@@ -12,7 +12,7 @@ const ImageCarousel = () => {
     <div className="p-6">
       <Carousel>
         <CarouselContent>
-          <CarouselItem className="pl-0 basis-1/2">
+          <CarouselItem className="pl-0 md:basis-1/2 sm:basis-auto">
             <div className="p-2">
               <img
                 className="object-cover rounded-2xl"
@@ -21,7 +21,7 @@ const ImageCarousel = () => {
               />
             </div>
           </CarouselItem>
-          <CarouselItem className="pl-0 basis-1/2">
+          <CarouselItem className="pl-0 md:basis-1/2 sm:basis-auto">
             <div className="p-2">
               <img
                 className="object-cover rounded-2xl"
@@ -30,7 +30,7 @@ const ImageCarousel = () => {
               />
             </div>
           </CarouselItem>
-          <CarouselItem className="pl-0 basis-1/2">
+          <CarouselItem className="pl-0 md:basis-1/2 sm:basis-auto">
             <div className="p-2">
               <img
                 className="object-cover rounded-2xl"
