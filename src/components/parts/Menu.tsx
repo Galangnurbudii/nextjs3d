@@ -40,9 +40,11 @@ const Menu = () => {
             />
           </CardContent>
           <CardFooter className="mt-2">
-            <Button className="w-full" variant="outline">
-              Design from Scratch
-            </Button>
+            <Link className="w-full" href={"/design-from-scratch"}>
+              <Button className="w-full" variant="outline">
+                Design from Scratch
+              </Button>
+            </Link>
           </CardFooter>
         </Card>
         <Card className="w-full p-2">

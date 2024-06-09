@@ -58,7 +58,7 @@ const SizeSettings = () => {
               <FormItem>
                 <FormLabel>Kedalaman (cm)</FormLabel>
                 <FormControl>
-                  <Input placeholder="Kedalaman" {...field} />
+                  <Input placeholder="Kedalaman (cm)" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -71,7 +71,7 @@ const SizeSettings = () => {
               <FormItem>
                 <FormLabel>Tinggi (cm)</FormLabel>
                 <FormControl>
-                  <Input placeholder="Ketinggian" {...field} />
+                  <Input placeholder="Ketinggian (cm)" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
