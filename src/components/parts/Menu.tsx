@@ -40,7 +40,7 @@ const Menu = () => {
             />
           </CardContent>
           <CardFooter className="mt-2">
-            <Link className="w-full" href={"/design-from-scratch"}>
+            <Link className="w-full" href={"/design-from-scratches/sizing"}>
               <Button className="w-full" variant="outline">
                 Design from Scratch
               </Button>
