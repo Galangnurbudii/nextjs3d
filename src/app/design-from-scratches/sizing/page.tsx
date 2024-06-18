@@ -57,7 +57,7 @@ const RoomSizing = () => {
           </div>
         </div>
         <div className="mt-4">
-          <Link href={"/design-from-scratches"}>
+          <Link href={"/design-from-scratches/menu"}>
             <Button variant="default" className="w-80 bg-neutral-700">
               {"Start Designing ->"}
             </Button>
