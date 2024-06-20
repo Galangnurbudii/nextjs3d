@@ -1,13 +1,11 @@
 import Item from "@/components/parts/Item";
-import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import Link from "next/link";
 import { IoArrowBackOutline } from "react-icons/io5";
-import { MdInfoOutline } from "react-icons/md";
 
 const Frame = () => {
   return (
-    <>
+    <div className="h-full">
       <div className="flex gap-6 items-center font-semibold text-xl text-neutral-700">
         <Link href={"/design-from-scratches/menu"}>
           <IoArrowBackOutline />
@@ -57,7 +55,7 @@ const Frame = () => {
         </div>
         <ScrollBar orientation="vertical" />
       </ScrollArea>
-    </>
+    </div>
   );
 };
 
