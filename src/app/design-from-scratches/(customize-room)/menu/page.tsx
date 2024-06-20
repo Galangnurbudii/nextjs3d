@@ -1,68 +1,62 @@
-import { Separator } from "@/components/ui/separator";
-import Link from "next/link";
-import { MdOutlineFilterFrames } from "react-icons/md";
-import { IoIosArrowForward } from "react-icons/io";
-import { RiArchiveDrawerLine } from "react-icons/ri";
-import { MdOutlineDoorSliding } from "react-icons/md";
-import { GiDoorHandle } from "react-icons/gi";
+'use client';
+import { useStore } from '@/app/store';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
-const CustomizeMenu = () => {
+const CustomizeMenu = ({
+  searchParams,
+}: {
+  searchParams: {
+    index: string;
+  };
+}) => {
+  const furnitures = useStore((state: any) => state.furnitures);
+  const updateState = useStore((state: any) => state.updateCustomization);
+
+  const handleCustomization = (value: string) => {
+    const parseVal = JSON.parse(value);
+
+    // console.log(typeof updateState);
+
+    updateState(parseInt(searchParams.index), {
+      [parseVal.key]: parseVal.value,
+    });
+  };
+
+  const metadata = furnitures[parseInt(searchParams.index)].metadata;
+
   return (
     <>
-      <h1 className="font-semibold text-xl text-neutral-700">
+      <h1 className='font-semibold text-xl text-neutral-700'>
         What part do you want to customize ?
       </h1>
-      <div className="mt-6">
-        <Link href={"/design-from-scratches/frame"}>
-          <div className="flex justify-between items-center p-5 text-lg">
-            <div className="flex gap-3 items-center">
-              <MdOutlineFilterFrames />
-              <h1>Rangka</h1>
-            </div>
-            <IoIosArrowForward />
-          </div>
-        </Link>
-        <Separator />
-        <Link href={"#"}>
-          <div className="flex justify-between items-center p-5 text-lg">
-            <div className="flex gap-3 items-center">
-              <RiArchiveDrawerLine />
-              <h1>Interior</h1>
-            </div>
-            <IoIosArrowForward />
-          </div>
-        </Link>
-        <Separator />
-        <Link href={"#"}>
-          <div className="flex justify-between items-center p-5 text-lg">
-            <div className="flex gap-3 items-center">
-              <MdOutlineDoorSliding />
-              <h1>Bagian Depan</h1>
-            </div>
-            <IoIosArrowForward />
-          </div>
-        </Link>
-        <Separator />
-        <Link href={"#"}>
-          <div className="flex justify-between items-center p-5 text-lg">
-            <div className="flex gap-3 items-center">
-              <MdOutlineFilterFrames />
-              <h1>Rangka</h1>
-            </div>
-            <IoIosArrowForward />
-          </div>
-        </Link>
-        <Separator />
-        <Link href={"#"}>
-          <div className="flex justify-between items-center p-5 text-lg">
-            <div className="flex gap-3 items-center">
-              <GiDoorHandle />
-              <h1>Gagang</h1>
-            </div>
-            <IoIosArrowForward />
-          </div>
-        </Link>
-        <Separator />
+      <div className='mt-6'>
+        <Accordion type='single' collapsible className='w-full'>
+          {Object.keys(metadata).map((item, index) => (
+            <AccordionItem value={item} key={index}>
+              <AccordionTrigger>{item}</AccordionTrigger>
+              <AccordionContent>
+                <ToggleGroup onValueChange={handleCustomization} type='single'>
+                  {(metadata[item as keyof typeof metadata] as string[]).map(
+                    (item2, index2) => (
+                      <ToggleGroupItem
+                        value={JSON.stringify({ key: item, value: item2 })}
+                        key={index2}
+                      >
+                        {item2}
+                      </ToggleGroupItem>
+                    )
+                  )}
+                </ToggleGroup>
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
       </div>
     </>
   );
