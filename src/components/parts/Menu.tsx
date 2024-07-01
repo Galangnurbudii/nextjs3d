@@ -14,24 +14,8 @@ import Link from "next/link";
 const Menu = () => {
   return (
     <div className="text-center mb-4 p-6 py-10 bg-neutral-100">
-      <div className="flex justify-center gap-4">
-        <Card className="w-full p-2">
-          <CardContent className="rounded-xl h-72">
-            <img
-              className="object-cover rounded-md w-full h-full"
-              src="/images/wardrobe5.jpg"
-              alt=""
-            />
-          </CardContent>
-          <CardFooter className="mt-2">
-            <Link className="w-full" href={"/guide-me"}>
-              <Button className="w-full" variant="outline">
-                Guide Me
-              </Button>
-            </Link>
-          </CardFooter>
-        </Card>
-        <Card className="w-full p-2">
+      <div className="flex justify-center gap-10">
+        <Card className="w-1/3 p-2">
           <CardContent className="rounded-xl h-72">
             <img
               className="object-cover rounded-t-md w-full h-full"
@@ -47,7 +31,7 @@ const Menu = () => {
             </Link>
           </CardFooter>
         </Card>
-        <Card className="w-full p-2">
+        <Card className="w-1/3 p-2">
           <CardContent className="rounded-xl h-72">
             <img
               className="object-cover rounded-t-md w-full h-full"

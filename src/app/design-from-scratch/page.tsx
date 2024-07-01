@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { OrbitControls } from '@react-three/drei';
-import { Canvas, useLoader } from '@react-three/fiber';
-import * as THREE from 'three';
-import { TextureLoader } from 'three';
-import { Model } from '@/components/Base6';
+import { OrbitControls } from "@react-three/drei";
+import { Canvas, useLoader } from "@react-three/fiber";
+import * as THREE from "three";
+import { TextureLoader } from "three";
+import { Model } from "@/components/Base6";
 
 import {
   Select,
@@ -12,17 +12,17 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { useState } from 'react';
+} from "@/components/ui/select";
+import { useState } from "react";
 
 export default function Home() {
   const repeat = 3;
   const plaster = useLoader(TextureLoader, [
-    'textures/plaster/Plaster_002_COLOR.jpg',
-    'textures/plaster/Plaster_002_DISP.png',
-    'textures/plaster/Plaster_002_NORM.jpg',
-    'textures/plaster/Plaster_002_ROUGH.jpg',
-    'textures/plaster/Plaster_002_OCC.jpg',
+    "textures/plaster/Plaster_002_COLOR.jpg",
+    "textures/plaster/Plaster_002_DISP.png",
+    "textures/plaster/Plaster_002_NORM.jpg",
+    "textures/plaster/Plaster_002_ROUGH.jpg",
+    "textures/plaster/Plaster_002_OCC.jpg",
   ]);
   plaster.map((item) => {
     item.wrapS = THREE.RepeatWrapping;
@@ -30,11 +30,11 @@ export default function Home() {
     item.repeat.set(repeat, repeat);
   });
   const wood = useLoader(TextureLoader, [
-    'textures/wood/Wood_Floor_012_basecolor.jpg',
-    'textures/wood/Wood_Floor_012_height.png',
-    'textures/wood/Wood_Floor_012_normal.jpg',
-    'textures/wood/Wood_Floor_012_roughness.jpg',
-    'textures/wood/Wood_Floor_012_ambientOcclusion.jpg',
+    "textures/wood/Wood_Floor_012_basecolor.jpg",
+    "textures/wood/Wood_Floor_012_height.png",
+    "textures/wood/Wood_Floor_012_normal.jpg",
+    "textures/wood/Wood_Floor_012_roughness.jpg",
+    "textures/wood/Wood_Floor_012_ambientOcclusion.jpg",
   ]);
   wood.map((item) => {
     item.wrapS = THREE.RepeatWrapping;
@@ -42,26 +42,26 @@ export default function Home() {
     item.repeat.set(repeat, repeat);
   });
 
-  const [pintu, setPintu] = useState<string>('');
-  const [handle, setHandle] = useState<string>('');
-  const [isian, setIsian] = useState<string>('');
-  const [kaki, setKaki] = useState<string>('');
+  const [pintu, setPintu] = useState<string>("");
+  const [handle, setHandle] = useState<string>("");
+  const [isian, setIsian] = useState<string>("");
+  const [kaki, setKaki] = useState<string>("");
 
   return (
-    <div className='w-screen h-screen'>
-      <div className='z-10 flex p-4 justify-center gap-4'>
+    <div className="w-screen h-screen">
+      <div className="z-10 flex p-4 justify-center gap-4">
         <Select
           onValueChange={(e) => {
             setPintu(e);
           }}
         >
-          <SelectTrigger className='w-[180px]'>
-            <SelectValue placeholder='Pintu' />
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Pintu" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value='pintu1'>Pintu 1</SelectItem>
-            <SelectItem value='pintu2'>Pintu 2</SelectItem>
-            <SelectItem value='pintu3'>Pintu 3</SelectItem>
+            <SelectItem value="pintu1">Pintu 1</SelectItem>
+            <SelectItem value="pintu2">Pintu 2</SelectItem>
+            <SelectItem value="pintu3">Pintu 3</SelectItem>
           </SelectContent>
         </Select>
         <Select
@@ -69,14 +69,14 @@ export default function Home() {
             setHandle(e);
           }}
         >
-          <SelectTrigger className='w-[180px]'>
-            <SelectValue placeholder='Handle' />
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Handle" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value='Handle_2_1'>Handle 1</SelectItem>
-            <SelectItem value='Handle_4_1'>Handle 2</SelectItem>
-            <SelectItem value='Handle_3_1'>Handle 3</SelectItem>
-            <SelectItem value='Handle_5__knob_1'>Handle 4</SelectItem>
+            <SelectItem value="Handle_2_1">Handle 1</SelectItem>
+            <SelectItem value="Handle_4_1">Handle 2</SelectItem>
+            <SelectItem value="Handle_3_1">Handle 3</SelectItem>
+            <SelectItem value="Handle_5__knob_1">Handle 4</SelectItem>
           </SelectContent>
         </Select>
         <Select
@@ -84,14 +84,14 @@ export default function Home() {
             setIsian(e);
           }}
         >
-          <SelectTrigger className='w-[180px]'>
-            <SelectValue placeholder='Isian' />
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Isian" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value='Appliances_2_1'>Isian 1</SelectItem>
-            <SelectItem value='Ambalan_1_1'>Isian 2</SelectItem>
-            <SelectItem value='Ambalan_2_1'>Isian 3</SelectItem>
-            <SelectItem value='Appliances_1_1'>Isian 4</SelectItem>
+            <SelectItem value="Appliances_2_1">Isian 1</SelectItem>
+            <SelectItem value="Ambalan_1_1">Isian 2</SelectItem>
+            <SelectItem value="Ambalan_2_1">Isian 3</SelectItem>
+            <SelectItem value="Appliances_1_1">Isian 4</SelectItem>
           </SelectContent>
         </Select>
         <Select
@@ -99,13 +99,13 @@ export default function Home() {
             setKaki(e);
           }}
         >
-          <SelectTrigger className='w-[180px]'>
-            <SelectValue placeholder='Kaki' />
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Kaki" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value='CB8_1'>Kaki 1</SelectItem>
-            <SelectItem value='CB2_1'>Kaki 2</SelectItem>
-            <SelectItem value='CB1_1'>Kaki 3</SelectItem>
+            <SelectItem value="CB8_1">Kaki 1</SelectItem>
+            <SelectItem value="CB2_1">Kaki 2</SelectItem>
+            <SelectItem value="CB1_1">Kaki 3</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -115,11 +115,11 @@ export default function Home() {
           castShadow
           position={[20, 50, 10]}
           intensity={6}
-          color={'#ffffff'}
+          color={"#ffffff"}
         />
         <directionalLight position={[-50, 0, -25]} intensity={2} />
         {/* <axesHelper args={[200]} /> */}
-        <color attach='background' args={['#949494']} />
+        <color attach="background" args={["#949494"]} />
         <mesh>
           <mesh
             position={[50, 100, -100]}

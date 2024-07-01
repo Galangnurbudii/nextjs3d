@@ -13,7 +13,7 @@ const Frame = () => {
         <h1>Frame</h1>
       </div>
 
-      <ScrollArea className="h-[450px] mt-6">
+      <ScrollArea className="h-[700px] mt-6">
         <h1 className="font-semibold">Kitchen</h1>
         <div className="flex flex-wrap">
           <Item

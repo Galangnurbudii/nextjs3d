@@ -2,6 +2,7 @@
 
 import RoomMap from "@/components/parts/RoomMap";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { ReactNode } from "react";
 
 const DesignFromScratches = ({ children }: { children: ReactNode }) => {
@@ -15,12 +16,14 @@ const DesignFromScratches = ({ children }: { children: ReactNode }) => {
           <h1 className="font-semibold text-xl text-neutral-700">
             Rp. 10.000.000,00
           </h1>
-          <Button
-            variant="default"
-            className="bg-neutral-700 rounded-full px-5"
-          >
-            {"Finalizing ->"}
-          </Button>
+          <Link href={"/summary"}>
+            <Button
+              variant="default"
+              className="bg-neutral-700 rounded-full px-5"
+            >
+              {"Finalizing ->"}
+            </Button>
+          </Link>
         </div>
         <div className="p-8 rounded-lg">{children}</div>
       </div>
