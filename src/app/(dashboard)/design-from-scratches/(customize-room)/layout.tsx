@@ -1,7 +1,11 @@
 "use client";
 
-import RoomMap from "@/components/parts/RoomMap";
+const RoomMap = dynamic(() => import("@/components/parts/RoomMap"), {
+  ssr: false,
+});
+
 import { Button } from "@/components/ui/button";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { ReactNode } from "react";
 

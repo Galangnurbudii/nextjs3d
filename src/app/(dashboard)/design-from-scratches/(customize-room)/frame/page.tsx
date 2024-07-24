@@ -7,7 +7,7 @@ const Frame = () => {
   return (
     <div className="h-full">
       <div className="flex gap-6 items-center font-semibold text-xl text-neutral-700">
-        <Link href={"/design-from-scratches/menu"}>
+        <Link href={"/design-from-scratches/menu"} prefetch={false}>
           <IoArrowBackOutline />
         </Link>
         <h1>Frame</h1>

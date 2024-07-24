@@ -13,7 +13,7 @@ const CustomizeMenu = () => {
         What part do you want to customize ?
       </h1>
       <div className="mt-6">
-        <Link href={"/design-from-scratches/frame"}>
+        <Link href={"/design-from-scratches/frame"} prefetch={false}>
           <div className="flex justify-between items-center p-5 text-lg">
             <div className="flex gap-3 items-center">
               <MdOutlineFilterFrames />
