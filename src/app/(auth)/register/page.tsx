@@ -3,33 +3,22 @@
 import { registerUser } from "@/actions/authActions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 const Register = () => {
-  const { toast } = useToast();
   const router = useRouter();
 
   const registerMutation = useMutation({
     mutationFn: registerUser,
     onSuccess: (data) => {
       if (!data.error) {
-        toast({
-          variant: "default",
-          title: "Success !",
-          description: "User has been registered",
-          className: "bg-green-500 text-white",
-        });
+        toast.success("User has been registered");
         router.push("/login");
       } else {
-        toast({
-          variant: "destructive",
-          title: "Uh oh! Something went wrong.",
-          description: data.error,
-          className: "text-white",
-        });
+        toast.error(data.error);
       }
     },
   });
@@ -53,12 +42,7 @@ const Register = () => {
         password: password,
       });
     } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: error.message,
-        className: "text-white",
-      });
+      toast.error(error.message);
     }
   }
 

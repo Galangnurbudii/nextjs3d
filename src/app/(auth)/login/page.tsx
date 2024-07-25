@@ -3,14 +3,13 @@
 import { loginUser } from "@/actions/authActions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 const Login = () => {
-  const { toast } = useToast();
   const router = useRouter();
 
   const loginMutation = useMutation({
@@ -19,12 +18,7 @@ const Login = () => {
       if (!data.error) {
         router.push("/");
       } else {
-        toast({
-          variant: "destructive",
-          title: "Uh oh! Something went wrong.",
-          description: data.error,
-          className: "text-white",
-        });
+        toast.error(data.error);
       }
     },
   });
@@ -38,12 +32,7 @@ const Login = () => {
 
       await loginMutation.mutateAsync({ email, password });
     } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: error.message,
-        className: "text-white",
-      });
+      toast.error(error.message);
     }
   }
 
@@ -66,7 +55,7 @@ const Login = () => {
             )}
           </Button>
           <h1 className="text-gray-500 text-sm">
-            Don't have account ?{" "}
+            {`Don't have account ? `}
             <Link className="font-bold underline" href={"/register"}>
               Sign Up
             </Link>

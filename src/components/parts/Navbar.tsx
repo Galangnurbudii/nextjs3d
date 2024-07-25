@@ -73,10 +73,10 @@ const Navbar = () => {
                         <span>Manage Transaction</span>
                       </DropdownMenuItem>
                     </DropdownMenuGroup>
+                    <DropdownMenuSeparator />
                   </>
                 )}
 
-                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => logoutMutation()}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log out</span>
