@@ -55,22 +55,27 @@ const Navbar = () => {
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56">
-                <DropdownMenuLabel>Admin </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem>
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Manage User</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Bed className="mr-2 h-4 w-4" />
-                    <span>Manage Item</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <ArrowRightLeft className="mr-2 h-4 w-4" />
-                    <span>Manage Transaction</span>
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
+                {data.role === "admin" && (
+                  <>
+                    <DropdownMenuLabel>Admin </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuGroup>
+                      <DropdownMenuItem>
+                        <User className="mr-2 h-4 w-4" />
+                        <span>Manage User</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Bed className="mr-2 h-4 w-4" />
+                        <span>Manage Item</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <ArrowRightLeft className="mr-2 h-4 w-4" />
+                        <span>Manage Transaction</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                  </>
+                )}
+
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => logoutMutation()}>
                   <LogOut className="mr-2 h-4 w-4" />

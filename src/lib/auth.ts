@@ -24,14 +24,26 @@ function decryptPayload(currentToken: string) {
 export async function getCurrentSession() {
   const currentToken = cookies().get("token")?.value;
   if (!currentToken) return null;
-  const payload = decryptPayload(currentToken) as { id: string; email: string };
+  const payload = decryptPayload(currentToken) as {
+    id: string;
+    email: string;
+    role: string;
+  };
   return payload;
 }
 
-export async function loginAuth({ id, email }: { id: string; email: string }) {
+export async function loginAuth({
+  id,
+  email,
+  role,
+}: {
+  id: string;
+  email: string;
+  role: string;
+}) {
   if (!id || !email) throw new Error("User not found");
 
-  const token = generateToken({ id, email });
+  const token = generateToken({ id, email, role });
   const expires = new Date(Date.now() + 30000 * 50);
 
   if (token) {
