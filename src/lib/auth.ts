@@ -32,7 +32,7 @@ export async function loginAuth({ id, email }: { id: string; email: string }) {
   if (!id || !email) throw new Error("User not found");
 
   const token = generateToken({ id, email });
-  const expires = new Date(Date.now() + 3000 * 5);
+  const expires = new Date(Date.now() + 30000 * 50);
 
   if (token) {
     cookies().set("token", token, { expires, httpOnly: true });

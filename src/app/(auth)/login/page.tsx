@@ -62,7 +62,7 @@ const Login = () => {
                 <AiOutlineLoading3Quarters className="animate-spin" />
               </div>
             ) : (
-              "Register"
+              "Login"
             )}
           </Button>
           <h1 className="text-gray-500 text-sm">

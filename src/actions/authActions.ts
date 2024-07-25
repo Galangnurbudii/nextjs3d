@@ -1,9 +1,10 @@
 "use server";
 
 import { db } from "@/db/db";
-import { UserTable } from "@/db/schema";
+import { user } from "@/db/schema";
 import { loginAuth } from "@/lib/auth";
 import { hash, compare } from "bcrypt";
+import { cookies } from "next/headers";
 
 export async function registerUser({
   email,
@@ -13,7 +14,7 @@ export async function registerUser({
   password: string;
 }): Promise<{ result: boolean; error?: string }> {
   try {
-    const isDuplicateEmailExist = await db.query.UserTable.findFirst({
+    const isDuplicateEmailExist = await db.query.user.findFirst({
       where: (table, fn) => fn.eq(table.email, email),
     });
 
@@ -22,7 +23,7 @@ export async function registerUser({
 
     const hashedPassword = await hash(password, 10);
 
-    await db.insert(UserTable).values({
+    await db.insert(user).values({
       email: email,
       password: hashedPassword,
     });
@@ -41,7 +42,7 @@ export async function loginUser({
   password: string;
 }): Promise<{ result: boolean; error?: string }> {
   try {
-    const user = await db.query.UserTable.findFirst({
+    const user = await db.query.user.findFirst({
       where: (table, fn) => fn.eq(table.email, email),
     });
 
@@ -57,4 +58,8 @@ export async function loginUser({
   } catch (error) {
     return { result: false, error: "Internal server error" };
   }
+}
+
+export async function logoutUser() {
+  cookies().delete("token");
 }
