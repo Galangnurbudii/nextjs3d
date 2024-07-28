@@ -5,7 +5,9 @@ const UserTable = pgTable("user", {
   email: varchar("email", { length: 255 }).notNull().unique(),
   password: varchar("password", { length: 255 }).notNull(),
   role: varchar("role", { length: 255 }).notNull().default("user"),
-  createTime: timestamp("create_time").defaultNow().notNull(),
+  createTime: timestamp("create_time", { mode: "string", withTimezone: true })
+    .defaultNow()
+    .notNull(),
 });
 
 export default UserTable;

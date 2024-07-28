@@ -60,18 +60,18 @@ const Navbar = () => {
                     <DropdownMenuLabel>Admin </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
-                      <DropdownMenuItem>
-                        <User className="mr-2 h-4 w-4" />
-                        <span>Manage User</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Bed className="mr-2 h-4 w-4" />
-                        <span>Manage Item</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <ArrowRightLeft className="mr-2 h-4 w-4" />
-                        <span>Manage Transaction</span>
-                      </DropdownMenuItem>
+                      <Link href={"/admin/user"}>
+                        <DropdownMenuItem>
+                          <User className="mr-2 h-4 w-4" />
+                          <span>Manage User</span>
+                        </DropdownMenuItem>
+                      </Link>
+                      <Link href={"/admin/item"}>
+                        <DropdownMenuItem>
+                          <Bed className="mr-2 h-4 w-4" />
+                          <span>Manage Item</span>
+                        </DropdownMenuItem>
+                      </Link>
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />
                   </>
