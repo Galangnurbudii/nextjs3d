@@ -47,7 +47,7 @@ const Login = () => {
           <Button className="w-full bg-slate-700" type="submit">
             {loginMutation.isPending ? (
               <div className="gap-2 flex items-center">
-                Processing{" "}
+                {"Processing"}
                 <AiOutlineLoading3Quarters className="animate-spin" />
               </div>
             ) : (

@@ -14,7 +14,7 @@ const UserAdmin = () => {
   });
 
   return (
-    <div className="p-8 rounded-2xl border">
+    <div className="p-8 rounded-2xl bg-white border">
       <div className="flex gap-3 text-xl font-semibold mb-5">
         <UserRoundCog />
         <h1>{"Users"}</h1>

@@ -47,10 +47,6 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
-  const usersCount = useQuery({
-    queryKey: ["usersCount"],
-    queryFn: () => getUsersCount(),
-  });
 
   const table = useReactTable({
     data,

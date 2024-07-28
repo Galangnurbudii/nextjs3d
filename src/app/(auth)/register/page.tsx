@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import Link from "next/link";
 
 const Register = () => {
   const router = useRouter();
@@ -75,6 +76,12 @@ const Register = () => {
               "Register"
             )}
           </Button>
+          <h1 className="text-gray-500 text-sm">
+            {`Already have an account ? `}
+            <Link className="font-bold underline" href={"/login"}>
+              Sign In
+            </Link>
+          </h1>
         </form>
       </div>
     </div>

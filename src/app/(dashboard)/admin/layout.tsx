@@ -1,7 +1,8 @@
 "use client";
 
+import { Separator } from "@/components/ui/separator";
 import clsx from "clsx";
-import { Bed, UserRoundCog } from "lucide-react";
+import { Bed, Settings, UserRoundCog } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
@@ -10,9 +11,13 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
   const pathname = usePathname();
 
   return (
-    <div className="flex p-10 gap-4">
-      <div className="w-[300px] space-y-10">
-        <h1 className="tracking-wider text-gray-400">ADMIN MENU</h1>
+    <div className="flex p-10 gap-8">
+      <div className="w-[300px] space-y-6 bg-white p-6 rounded-xl h-fit">
+        <h1 className="tracking-wider text-gray-400 text-lg flex gap-3 items-center justify-center">
+          <Settings />
+          Admin Menu
+        </h1>
+        <Separator />
         <div className="space-y-4">
           <Link href={"/admin/user"}>
             <div

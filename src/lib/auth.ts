@@ -1,49 +1,61 @@
 "use server";
 
-import { sign, verify } from "jsonwebtoken";
+// import { sign, verify } from "jsonwebtoken";
+
+import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
 const secretKey = process.env.SECRET_KEY;
+const key = new TextEncoder().encode(secretKey);
 
-function generateToken(payload: any) {
+interface UserPayload {
+  id: string;
+  email: string;
+  role: string;
+}
+
+async function generateToken(payload: any) {
   if (secretKey) {
-    const token = sign(payload, secretKey);
+    const token = await new SignJWT(payload)
+      .setProtectedHeader({ alg: "HS256" })
+      .setIssuedAt()
+      .setExpirationTime("10 min from now")
+      .sign(key);
     return token;
   }
   return null;
 }
 
-function decryptPayload(currentToken: string) {
-  if (secretKey) {
-    const payload = verify(currentToken, secretKey);
-    return payload;
+async function decryptPayload(currentToken: string) {
+  try {
+    if (key) {
+      const { payload } = await jwtVerify(currentToken, key, {
+        algorithms: ["HS256"],
+      });
+      console.log(payload);
+
+      return {
+        id: payload.id,
+        email: payload.email,
+        role: payload.role,
+      } as UserPayload;
+    }
+  } catch (error) {
+    return null;
   }
-  return null;
 }
 
 export async function getCurrentSession() {
   const currentToken = cookies().get("token")?.value;
   if (!currentToken) return null;
-  const payload = decryptPayload(currentToken) as {
-    id: string;
-    email: string;
-    role: string;
-  };
+  const payload = await decryptPayload(currentToken);
   return payload;
 }
 
-export async function loginAuth({
-  id,
-  email,
-  role,
-}: {
-  id: string;
-  email: string;
-  role: string;
-}) {
+export async function loginAuth({ id, email, role }: UserPayload) {
   if (!id || !email) throw new Error("User not found");
 
-  const token = generateToken({ id, email, role });
+  const token = await generateToken({ id, email, role });
   const expires = new Date(Date.now() + 30000 * 50);
 
   if (token) {
