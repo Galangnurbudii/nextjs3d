@@ -2,6 +2,7 @@ import { convertDate } from "@/utils/convertDate";
 import { ColumnDef } from "@tanstack/react-table";
 import { LuKeyRound } from "react-icons/lu";
 import { FaRegUser } from "react-icons/fa";
+import UserDropdown from "@/components/parts/UserDropdown";
 
 export type User = {
   name: string;
@@ -52,6 +53,14 @@ export const columns: ColumnDef<User>[] = [
       const date: string = row.getValue("createdTime");
       const formattedDate = convertDate(date);
       return formattedDate;
+    },
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => {
+      const user = row.original;
+
+      return <UserDropdown email={user.email} role={user.role} />;
     },
   },
 ];
