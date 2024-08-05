@@ -26,6 +26,7 @@ const Register = () => {
 
   async function register(formData: FormData) {
     try {
+      const name = formData.get("name")?.toString().trim();
       const email = formData.get("email")?.toString().trim();
       const password = formData.get("password")?.toString().trim();
       const confirmPassword = formData
@@ -33,12 +34,13 @@ const Register = () => {
         ?.toString()
         .trim();
 
-      if (!email || !password || !confirmPassword)
+      if (!name || !email || !password || !confirmPassword)
         throw new Error("Please fill all the field");
       if (password !== confirmPassword)
         throw new Error("Password do not match");
 
       await registerMutation.mutateAsync({
+        name: name,
         email: email,
         password: password,
       });
@@ -53,6 +55,7 @@ const Register = () => {
         <img src="/images/logo.png" alt="" width={120} height={120} />
 
         <form action={register} className="space-y-4 w-full text-center">
+          <Input required type="name" placeholder="Name" name="name" />
           <Input required type="email" placeholder="Email" name="email" />
           <Input
             required

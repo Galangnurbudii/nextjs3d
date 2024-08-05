@@ -8,6 +8,7 @@ export async function getAllUsers() {
   try {
     const allUsers = await db
       .select({
+        name: user.name,
         email: user.email,
         role: user.role,
         createdTime: user.createTime,

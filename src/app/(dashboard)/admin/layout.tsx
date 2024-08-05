@@ -13,7 +13,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
   return (
     <div className="flex p-10 gap-8">
       <div className="w-[300px] space-y-6 bg-white p-6 rounded-xl h-fit">
-        <h1 className="tracking-wider text-gray-400 text-lg flex gap-3 items-center justify-center">
+        <h1 className="tracking-wider text-gray-400 flex gap-3 items-center justify-center">
           <Settings />
           Admin Menu
         </h1>

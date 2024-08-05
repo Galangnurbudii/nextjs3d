@@ -7,9 +7,11 @@ import { hash, compare } from "bcrypt";
 import { cookies } from "next/headers";
 
 export async function registerUser({
+  name,
   email,
   password,
 }: {
+  name: string;
   email: string;
   password: string;
 }): Promise<{ result: boolean; error?: string }> {
@@ -24,6 +26,7 @@ export async function registerUser({
     const hashedPassword = await hash(password, 10);
 
     await db.insert(user).values({
+      name: name,
       email: email,
       password: hashedPassword,
     });
@@ -52,7 +55,12 @@ export async function loginUser({
 
     if (!isPasswordMatch) return { result: false, error: "Incorrect password" };
 
-    await loginAuth({ id: user.id, email: user.email, role: user.role });
+    await loginAuth({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    });
 
     return { result: true };
   } catch (error) {

@@ -17,7 +17,7 @@ const UserAdmin = () => {
     <div className="p-8 rounded-2xl bg-white border">
       <div className="flex gap-3 text-xl font-semibold mb-5">
         <UserRoundCog />
-        <h1>{"Users"}</h1>
+        <h1 className="font-normal">{"Users Management"}</h1>
       </div>
       <div>
         {users.isLoading ? (

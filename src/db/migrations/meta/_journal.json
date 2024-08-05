@@ -15,6 +15,13 @@
       "when": 1722058053489,
       "tag": "0001_optimal_ultron",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1722841414124,
+      "tag": "0002_clumsy_sersi",
+      "breakpoints": true
     }
   ]
 }

@@ -64,7 +64,7 @@ const Navbar = () => {
                       <AvatarImage src="https://github.com/shadcn.png" />
                       <AvatarFallback>U</AvatarFallback>
                     </Avatar>
-                    <h1>{session.data.email}</h1>
+                    <h1>{session.data.name}</h1>
                   </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56">

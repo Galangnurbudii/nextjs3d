@@ -1,7 +1,5 @@
 "use server";
 
-// import { sign, verify } from "jsonwebtoken";
-
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
@@ -10,6 +8,7 @@ const key = new TextEncoder().encode(secretKey);
 
 interface UserPayload {
   id: string;
+  name: string;
   email: string;
   role: string;
 }
@@ -36,6 +35,7 @@ async function decryptPayload(currentToken: string) {
 
       return {
         id: payload.id,
+        name: payload.name,
         email: payload.email,
         role: payload.role,
       } as UserPayload;
@@ -52,10 +52,10 @@ export async function getCurrentSession() {
   return payload;
 }
 
-export async function loginAuth({ id, email, role }: UserPayload) {
+export async function loginAuth({ id, name, email, role }: UserPayload) {
   if (!id || !email) throw new Error("User not found");
 
-  const token = await generateToken({ id, email, role });
+  const token = await generateToken({ id, name, email, role });
   const expires = new Date(Date.now() + 30000 * 50);
 
   if (token) {
