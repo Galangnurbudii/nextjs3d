@@ -1,6 +1,6 @@
 "use client";
 
-import { getAllUsers } from "@/actions/admin/userAction";
+import { getAllUsers, getCurrentUser } from "@/actions/admin/userAction";
 import { useQuery } from "@tanstack/react-query";
 import { UserRoundCog } from "lucide-react";
 import { DataTable } from "./data-table";
@@ -12,6 +12,15 @@ const UserAdmin = () => {
     queryKey: ["users"],
     queryFn: () => getAllUsers(),
   });
+
+  const currentUser = useQuery({
+    queryKey: ["currentUser"],
+    queryFn: () => getCurrentUser(),
+  });
+
+  if (currentUser.data?.role !== "admin") {
+    return <h1>You're not authorized to access this page</h1>;
+  }
 
   return (
     <div className="p-8 rounded-2xl bg-white border">

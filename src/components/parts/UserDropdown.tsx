@@ -8,13 +8,34 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Ellipsis, KeyRound, Trash2, UserX } from "lucide-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { setAsAdmin, setAsUser } from "@/actions/admin/userAction";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  deleteUser,
+  getCurrentUser,
+  setAsAdmin,
+  setAsUser,
+} from "@/actions/admin/userAction";
 import { toast } from "sonner";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { useRouter } from "next/navigation";
+import { logoutUser } from "@/actions/authActions";
 
 const UserDropdown = ({ email, role }: { email: string; role: string }) => {
   const queryClient = useQueryClient();
+  const router = useRouter();
+
+  const currentUser = useQuery({
+    queryKey: ["currentUser"],
+    queryFn: async () => await getCurrentUser(),
+  });
+
+  const { mutateAsync: logoutMutation } = useMutation({
+    mutationFn: logoutUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+      router.push("/");
+    },
+  });
 
   const setAsAdminMutation = useMutation({
     mutationFn: setAsAdmin,
@@ -22,6 +43,7 @@ const UserDropdown = ({ email, role }: { email: string; role: string }) => {
       if (!data.error) {
         toast.success("User's role has changed to Admin");
         queryClient.invalidateQueries({ queryKey: ["users"] });
+        queryClient.invalidateQueries({ queryKey: ["currentUser"] });
       } else {
         toast.error(data.error);
       }
@@ -34,6 +56,23 @@ const UserDropdown = ({ email, role }: { email: string; role: string }) => {
       if (!data.error) {
         toast.success("User's role has changed to User");
         queryClient.invalidateQueries({ queryKey: ["users"] });
+        queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+      } else {
+        toast.error(data.error);
+      }
+    },
+  });
+
+  const deleteUserMutation = useMutation({
+    mutationFn: deleteUser,
+    onSuccess: async (data) => {
+      if (!data.error) {
+        toast.success(`User has been deleted`);
+        queryClient.invalidateQueries({ queryKey: ["users"] });
+
+        if (currentUser.data?.email === email) {
+          await logoutMutation();
+        }
       } else {
         toast.error(data.error);
       }
@@ -56,7 +95,11 @@ const UserDropdown = ({ email, role }: { email: string; role: string }) => {
     }
   };
 
-  if (setAsAdminMutation.isPending || setAsUserMutation.isPending) {
+  if (
+    setAsAdminMutation.isPending ||
+    setAsUserMutation.isPending ||
+    deleteUserMutation.isPending
+  ) {
     return (
       <Button variant="ghost" size="sm" disabled>
         <AiOutlineLoading3Quarters className="animate-spin w-4 h-4" />
@@ -98,7 +141,12 @@ const UserDropdown = ({ email, role }: { email: string; role: string }) => {
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem className="text-red-600">
-            <div className="gap-2 flex items-center">
+            <div
+              className="gap-2 flex items-center"
+              onClick={async () => {
+                await deleteUserMutation.mutateAsync({ email });
+              }}
+            >
               <Trash2 className="h-4 w-4" />
               Delete user
             </div>

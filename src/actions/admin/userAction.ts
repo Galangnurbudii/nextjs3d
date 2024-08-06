@@ -2,7 +2,8 @@
 
 import { db } from "@/db/db";
 import { user } from "@/db/schema";
-import { asc, count, eq } from "drizzle-orm";
+import { getCurrentSession } from "@/lib/auth";
+import { asc, eq } from "drizzle-orm";
 
 export async function getAllUsers() {
   try {
@@ -22,10 +23,28 @@ export async function getAllUsers() {
   }
 }
 
-export async function getUsersCount() {
+export async function getCurrentUser() {
   try {
-    const usersCount = await db.select({ count: count() }).from(user);
-    return usersCount[0].count;
+    const payload = await getCurrentSession();
+    if (payload) {
+      const selectedUser = await db.query.user.findFirst({
+        where: eq(user.email, payload?.email),
+      });
+      if (!selectedUser) return null;
+      return selectedUser;
+    }
+    return null;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function getUserByEmail({ email }: { email: string }) {
+  try {
+    const selectedUser = await db.query.user.findFirst({
+      where: eq(user.email, email),
+    });
+    return selectedUser;
   } catch (error) {
     console.log(error);
   }
@@ -44,6 +63,16 @@ export async function setAsAdmin({ email }: { email: string }) {
 export async function setAsUser({ email }: { email: string }) {
   try {
     await db.update(user).set({ role: "user" }).where(eq(user.email, email));
+    return { result: true };
+  } catch (error) {
+    console.log(error);
+    return { result: false, error: "Internal server error" };
+  }
+}
+
+export async function deleteUser({ email }: { email: string }) {
+  try {
+    await db.delete(user).where(eq(user.email, email));
     return { result: true };
   } catch (error) {
     console.log(error);

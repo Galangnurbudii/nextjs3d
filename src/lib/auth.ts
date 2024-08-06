@@ -2,15 +2,13 @@
 
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 
 const secretKey = process.env.SECRET_KEY;
 const key = new TextEncoder().encode(secretKey);
 
 interface UserPayload {
-  id: string;
-  name: string;
   email: string;
-  role: string;
 }
 
 async function generateToken(payload: any) {
@@ -52,10 +50,26 @@ export async function getCurrentSession() {
   return payload;
 }
 
-export async function loginAuth({ id, name, email, role }: UserPayload) {
-  if (!id || !email) throw new Error("User not found");
+export async function updateExpiredCurrentSession() {
+  const currentPayload = await getCurrentSession();
+  if (!currentPayload) return null;
+  const res = NextResponse.next();
+  const token = await generateToken({
+    email: currentPayload.email,
+  });
+  if (token) {
+    res.cookies.set("token", token, {
+      expires: new Date(Date.now() + 30000 * 50),
+      httpOnly: true,
+    });
+  }
+  return res;
+}
 
-  const token = await generateToken({ id, name, email, role });
+export async function loginAuth({ email }: UserPayload) {
+  if (!email) throw new Error("User not found");
+
+  const token = await generateToken({ email });
   const expires = new Date(Date.now() + 30000 * 50);
 
   if (token) {

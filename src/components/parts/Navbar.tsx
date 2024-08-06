@@ -21,6 +21,7 @@ import { Bed, LogOut, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "../ui/skeleton";
 import { Separator } from "../ui/separator";
+import { getCurrentUser } from "@/actions/admin/userAction";
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -28,7 +29,7 @@ const Navbar = () => {
   const router = useRouter();
 
   const session = useQuery({
-    queryFn: async () => await getCurrentSession(),
+    queryFn: async () => await getCurrentUser(),
     queryKey: ["currentUser"],
   });
 

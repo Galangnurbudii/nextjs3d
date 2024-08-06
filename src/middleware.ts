@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getCurrentSession } from "./lib/auth";
+import { getCurrentSession, updateExpiredCurrentSession } from "./lib/auth";
+import { getUserByEmail } from "./actions/admin/userAction";
 
 const protectedRoutes = [
   "/login",
@@ -28,6 +29,9 @@ export async function middleware(request: NextRequest) {
 
   if (isProtectedRoutes) {
     const currentSession = await getCurrentSession();
+    // const currentUser = currentSession
+    //   ? await getUserByEmail({ email: currentSession?.email })
+    //   : null;
 
     if (
       currentRoute.startsWith("/_next") ||
@@ -57,13 +61,9 @@ export async function middleware(request: NextRequest) {
     ) {
       return NextResponse.redirect(new URL("/", request.nextUrl));
     }
-
-    if (currentSession?.role !== "admin" && currentRoute.startsWith("/admin")) {
-      return NextResponse.redirect(new URL("/", request.nextUrl));
-    }
   }
 
-  return NextResponse.next();
+  return await updateExpiredCurrentSession();
 }
 
 export const config = {
