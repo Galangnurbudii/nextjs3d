@@ -18,7 +18,7 @@ const UserAdmin = () => {
     queryFn: () => getCurrentUser(),
   });
 
-  if (currentUser.data?.role !== "admin") {
+  if (currentUser.isFetched && currentUser.data?.role !== "admin") {
     return <h1>You're not authorized to access this page</h1>;
   }
 

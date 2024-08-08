@@ -1,3 +1,5 @@
+"use client";
+
 import {
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -15,6 +17,8 @@ import {
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { logoutUser } from "@/actions/authActions";
+import { useState } from "react";
+import ConfirmationAlert from "./ConfirmationAlert";
 
 const UserDropdownContent = ({
   email,
@@ -25,6 +29,7 @@ const UserDropdownContent = ({
 }) => {
   const queryClient = useQueryClient();
   const router = useRouter();
+  const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
 
   const currentUser = useQuery({
     queryKey: ["currentUser"],
@@ -98,45 +103,56 @@ const UserDropdownContent = ({
   };
 
   return (
-    <DropdownMenuContent align="end" className="w-[200px]">
-      <DropdownMenuGroup>
-        <DropdownMenuItem>
-          {role === "admin" ? (
+    <>
+      <ConfirmationAlert
+        title={"Are you sure want to delete this user ?"}
+        description={
+          "This action cannot be undone and this user will be removed permanently"
+        }
+        action={async () => await deleteUserMutation.mutateAsync({ email })}
+        isOpen={isDeleteOpen}
+        setIsOpen={setIsDeleteOpen}
+        type="destructive"
+      />
+
+      <DropdownMenuContent align="end" className="w-[200px]">
+        <DropdownMenuGroup>
+          <DropdownMenuItem>
+            {role === "admin" ? (
+              <div
+                className="gap-2 flex items-center"
+                onClick={() => {
+                  handleSetUser(email);
+                }}
+              >
+                <UserX className="h-4 w-4" />
+                Remove from admin
+              </div>
+            ) : (
+              <div
+                className="gap-2 flex items-center"
+                onClick={() => {
+                  handleSetAdmin(email);
+                }}
+              >
+                <KeyRound className="h-4 w-4" />
+                Make it admin
+              </div>
+            )}
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className="text-red-600">
             <div
               className="gap-2 flex items-center"
-              onClick={() => {
-                handleSetUser(email);
-              }}
+              onClick={() => setIsDeleteOpen(true)}
             >
-              <UserX className="h-4 w-4" />
-              Remove from admin
+              <Trash2 className="h-4 w-4" />
+              Delete user
             </div>
-          ) : (
-            <div
-              className="gap-2 flex items-center"
-              onClick={() => {
-                handleSetAdmin(email);
-              }}
-            >
-              <KeyRound className="h-4 w-4" />
-              Make it admin
-            </div>
-          )}
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem className="text-red-600">
-          <div
-            className="gap-2 flex items-center"
-            onClick={async () => {
-              await deleteUserMutation.mutateAsync({ email });
-            }}
-          >
-            <Trash2 className="h-4 w-4" />
-            Delete user
-          </div>
-        </DropdownMenuItem>
-      </DropdownMenuGroup>
-    </DropdownMenuContent>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </>
   );
 };
 

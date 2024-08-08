@@ -2,7 +2,7 @@
 
 import { Item } from "@/app/(dashboard)/admin/item/columns";
 import { db } from "@/db/db";
-import { item } from "@/db/schema";
+import { item, lower } from "@/db/schema";
 import { asc, eq } from "drizzle-orm";
 
 export async function getAllItems() {
@@ -11,6 +11,31 @@ export async function getAllItems() {
     return allItems;
   } catch (error) {
     console.log(error);
+  }
+}
+
+export async function addItem({ name, code, description, price }: Item) {
+  try {
+    const isDuplicateName = await db.query.item.findFirst({
+      where: eq(lower(item.name), name.toLowerCase()),
+    });
+
+    if (isDuplicateName)
+      return { result: false, error: "Item name can't be duplicate" };
+
+    const isDuplicateCode = await db.query.item.findFirst({
+      where: eq(lower(item.code), code.toLowerCase()),
+    });
+
+    if (isDuplicateCode)
+      return { result: false, error: "Item code can't be duplicate" };
+
+    await db.insert(item).values({ name, code, description, price });
+
+    return { result: true };
+  } catch (error: any) {
+    console.log(error.message);
+    return { result: false, error: "Internal server error" };
   }
 }
 
@@ -29,6 +54,16 @@ export async function editItem({ name, code, description, price }: Item) {
       return { result: true };
     }
     return { result: false, error: "Item code can't be duplicate" };
+  } catch (error: any) {
+    console.log(error.message);
+    return { result: false, error: "Internal server error" };
+  }
+}
+
+export async function deleteItem({ name }: { name: string }) {
+  try {
+    await db.delete(item).where(eq(item.name, name));
+    return { result: true };
   } catch (error: any) {
     console.log(error.message);
     return { result: false, error: "Internal server error" };

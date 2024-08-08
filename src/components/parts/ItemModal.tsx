@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { editItem } from "@/actions/admin/itemAction";
+import { addItem, editItem } from "@/actions/admin/itemAction";
 import { toast } from "sonner";
 import { Dispatch, SetStateAction } from "react";
 
@@ -29,17 +29,17 @@ const EditItemModal = ({
   item,
   setIsEditOpen,
 }: {
-  item: Item;
+  item?: Item;
   setIsEditOpen: Dispatch<SetStateAction<boolean>>;
 }) => {
   const queryClient = useQueryClient();
 
   const form = useForm<Item>({
     defaultValues: {
-      name: item.name,
-      code: item.code,
-      description: item.description,
-      price: item.price,
+      name: item?.name,
+      code: item?.code,
+      description: item?.description,
+      price: item?.price,
     },
   });
 
@@ -56,20 +56,43 @@ const EditItemModal = ({
     },
   });
 
+  const addItemMutation = useMutation({
+    mutationFn: addItem,
+    onSuccess: (data) => {
+      if (!data.error) {
+        toast.success("Item has been added");
+        setIsEditOpen(false);
+        form.reset();
+        queryClient.invalidateQueries({ queryKey: ["items"] });
+      } else {
+        toast.error(data.error);
+      }
+    },
+  });
+
   return (
     <DialogContent className="sm:max-w-[500px]">
       <DialogHeader>
-        <DialogTitle>Edit Item</DialogTitle>
+        <DialogTitle>{item ? "Edit Item" : "Add New Item"}</DialogTitle>
         <DialogDescription>
-          Make changes to this item and click save when you're done
+          {item
+            ? "Make changes to this item and click save when you're done"
+            : "Fill the item information below and click save when you're done"}
         </DialogDescription>
       </DialogHeader>
       <Form {...form}>
         <form
-          onSubmit={async (e) => {
-            e.preventDefault();
-            await editItemMutation.mutateAsync(form.getValues());
-          }}
+          onSubmit={
+            item
+              ? async (e) => {
+                  e.preventDefault();
+                  await editItemMutation.mutateAsync(form.getValues());
+                }
+              : async (e) => {
+                  e.preventDefault();
+                  await addItemMutation.mutateAsync(form.getValues());
+                }
+          }
         >
           <div className="space-y-3">
             <FormField
@@ -79,7 +102,11 @@ const EditItemModal = ({
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Item name ..." disabled {...field} />
+                    <Input
+                      placeholder="Item name ..."
+                      disabled={item ? true : false}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
