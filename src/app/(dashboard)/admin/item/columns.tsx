@@ -1,3 +1,5 @@
+import Dropdown from "@/components/parts/Dropdown";
+import ItemDropdownContent from "@/components/parts/ItemDropdownContent";
 import { formatPrice } from "@/utils/formatPrice";
 import { ColumnDef } from "@tanstack/react-table";
 
@@ -29,6 +31,18 @@ export const columns: ColumnDef<Item>[] = [
       const formattedPrice = formatPrice(price);
 
       return formattedPrice;
+    },
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => {
+      const data = row.original;
+
+      return (
+        <Dropdown>
+          <ItemDropdownContent item={data} />
+        </Dropdown>
+      );
     },
   },
 ];

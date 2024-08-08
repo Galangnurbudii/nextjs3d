@@ -2,7 +2,8 @@ import { convertDate } from "@/utils/convertDate";
 import { ColumnDef } from "@tanstack/react-table";
 import { LuKeyRound } from "react-icons/lu";
 import { FaRegUser } from "react-icons/fa";
-import UserDropdown from "@/components/parts/UserDropdown";
+import Dropdown from "@/components/parts/Dropdown";
+import UserDropdownContent from "@/components/parts/UserDropdownContent";
 
 export type User = {
   name: string;
@@ -60,7 +61,11 @@ export const columns: ColumnDef<User>[] = [
     cell: ({ row }) => {
       const user = row.original;
 
-      return <UserDropdown email={user.email} role={user.role} />;
+      return (
+        <Dropdown>
+          <UserDropdownContent email={user.email} role={user.role} />
+        </Dropdown>
+      );
     },
   },
 ];
