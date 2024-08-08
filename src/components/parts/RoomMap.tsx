@@ -1,6 +1,6 @@
 'use client';
 import { useStore } from '@/app/store';
-import { Helper, OrbitControls, Select } from '@react-three/drei';
+import { DragControls, Helper, OrbitControls, Select } from '@react-three/drei';
 import { Canvas, useLoader } from '@react-three/fiber';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -70,7 +70,7 @@ const RoomMap = () => {
   };
 
   const [positions, setPositions] = useState<number[]>([]);
-  const meshesRef = useRef<(THREE.Object3D | null)[]>([]);
+  const meshesRef = useRef<(THREE.Mesh | null)[]>([]);
 
   useEffect(() => {
     const calculatePositions = () => {
@@ -82,7 +82,7 @@ const RoomMap = () => {
             meshesRef.current[index] as THREE.Object3D
           );
           const bboxSize = new THREE.Vector3();
-          currentWidth = bbox.getSize(bboxSize).x + 10;
+          currentWidth = bbox.getSize(bboxSize).x;
         }
         const position = accumulatedX;
         accumulatedX += currentWidth;
@@ -93,6 +93,12 @@ const RoomMap = () => {
 
     calculatePositions();
   }, [furnitures]);
+
+  const setMeshRef = (index: number) => (el: THREE.Mesh | null) => {
+    meshesRef.current[index] = el;
+  };
+
+  const [isOrbitEnabled, setIsOrbitEnabled] = useState<boolean>(true);
 
   return (
     <Canvas camera={{ position: [50, 50, 200] }} shadows className='rounded-lg'>
@@ -110,14 +116,25 @@ const RoomMap = () => {
       <mesh>
         <Select box onChangePointerUp={handleSelect} filter={(items) => items}>
           {furnitures.map((item: any, index: number) => (
-            <mesh
+            <DragControls
               key={index}
-              ref={(el) => (meshesRef.current[index] = el)}
-              userData={{ furniture_id: index }}
-              position={[positions[index] || 0, 0, 100]}
+              axisLock='y'
+              dragLimits={[[-50, 100], [0,0], [0,100]]}
+              onDragStart={() => {
+                setIsOrbitEnabled(false);
+              }}
+              onDragEnd={() => {
+                setIsOrbitEnabled(true);
+              }}
             >
-              <item.Model {...item.customization} />
-            </mesh>
+              <mesh
+                ref={setMeshRef(index)}
+                userData={{ furniture_id: index }}
+                position={[positions[index] || 0, 0, 100]}
+              >
+                <item.Model {...item.customization} />
+              </mesh>
+            </DragControls>
           ))}
         </Select>
         <mesh
@@ -171,7 +188,7 @@ const RoomMap = () => {
         </mesh>
       </mesh>
 
-      <OrbitControls />
+      <OrbitControls enabled={isOrbitEnabled} />
     </Canvas>
   );
 };
