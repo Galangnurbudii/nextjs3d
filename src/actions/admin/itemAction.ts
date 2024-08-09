@@ -3,7 +3,7 @@
 import { Item } from "@/app/(dashboard)/admin/item/columns";
 import { db } from "@/db/db";
 import { item, lower } from "@/db/schema";
-import { asc, eq } from "drizzle-orm";
+import { and, asc, eq, ne } from "drizzle-orm";
 
 export async function getAllItems() {
   try {
@@ -14,7 +14,7 @@ export async function getAllItems() {
   }
 }
 
-export async function addItem({ name, code, description, price }: Item) {
+export async function addItem({ name, code, description, price, image }: Item) {
   try {
     const isDuplicateName = await db.query.item.findFirst({
       where: eq(lower(item.name), name.toLowerCase()),
@@ -30,7 +30,7 @@ export async function addItem({ name, code, description, price }: Item) {
     if (isDuplicateCode)
       return { result: false, error: "Item code can't be duplicate" };
 
-    await db.insert(item).values({ name, code, description, price });
+    await db.insert(item).values({ name, code, description, price, image });
 
     return { result: true };
   } catch (error: any) {
@@ -39,16 +39,30 @@ export async function addItem({ name, code, description, price }: Item) {
   }
 }
 
-export async function editItem({ name, code, description, price }: Item) {
+export async function editItem({
+  name,
+  code,
+  description,
+  price,
+  image,
+}: {
+  name: string;
+  code: string;
+  description: string;
+  price: number;
+  image?: string;
+}) {
   try {
+    console.log(name, code, description, price, image);
+
     const checkCode = await db.query.item.findFirst({
-      where: eq(item.code, code),
+      where: and(eq(item.code, code), ne(item.name, name)),
     });
 
     if (!checkCode) {
       await db
         .update(item)
-        .set({ code, description, price })
+        .set({ code, description, price, image })
         .where(eq(item.name, name));
 
       return { result: true };

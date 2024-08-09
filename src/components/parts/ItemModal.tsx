@@ -1,29 +1,34 @@
+"use client";
+
 import { Item } from "@/app/(dashboard)/admin/item/columns";
 import { Button } from "@/components/ui/button";
 import {
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "../ui/textarea";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addItem, editItem } from "@/actions/admin/itemAction";
 import { toast } from "sonner";
-import { Dispatch, SetStateAction } from "react";
+import {
+  Dispatch,
+  FormEventHandler,
+  ReactEventHandler,
+  SetStateAction,
+  SyntheticEvent,
+} from "react";
 
 const EditItemModal = ({
   item,
@@ -34,12 +39,19 @@ const EditItemModal = ({
 }) => {
   const queryClient = useQueryClient();
 
-  const form = useForm<Item>({
+  const form = useForm<{
+    name: string;
+    code: string;
+    description: string;
+    price: number;
+    image: File | string;
+  }>({
     defaultValues: {
       name: item?.name,
       code: item?.code,
       description: item?.description,
       price: item?.price,
+      image: "",
     },
   });
 
@@ -70,6 +82,46 @@ const EditItemModal = ({
     },
   });
 
+  const convertBase64 = async (file: File) => {
+    const base64string = await new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(file);
+
+      fileReader.onload = () => {
+        resolve(fileReader.result);
+      };
+
+      fileReader.onerror = (error) => {
+        reject(error);
+      };
+    }).then((res) => {
+      return res as string;
+    });
+
+    return base64string;
+  };
+
+  async function handleSubmit(e: SyntheticEvent) {
+    e.preventDefault();
+    const formData = form.getValues();
+
+    if (typeof formData.image !== "string") {
+      const data = {
+        name: formData.name,
+        code: formData.code,
+        description: formData.description,
+        price: formData.price,
+        image: await convertBase64(formData.image),
+      };
+
+      if (item) {
+        await editItemMutation.mutateAsync(data);
+      } else {
+        await addItemMutation.mutateAsync(data);
+      }
+    }
+  }
+
   return (
     <DialogContent className="sm:max-w-[500px]">
       <DialogHeader>
@@ -81,21 +133,9 @@ const EditItemModal = ({
         </DialogDescription>
       </DialogHeader>
       <Form {...form}>
-        <form
-          onSubmit={
-            item
-              ? async (e) => {
-                  e.preventDefault();
-                  await editItemMutation.mutateAsync(form.getValues());
-                }
-              : async (e) => {
-                  e.preventDefault();
-                  await addItemMutation.mutateAsync(form.getValues());
-                }
-          }
-        >
+        <form onSubmit={handleSubmit}>
           <div className="space-y-3">
-            <FormField
+            <Controller
               control={form.control}
               name="name"
               render={({ field }: { field: any }) => (
@@ -112,7 +152,7 @@ const EditItemModal = ({
                 </FormItem>
               )}
             />
-            <FormField
+            <Controller
               control={form.control}
               name="code"
               render={({ field }: { field: any }) => (
@@ -125,7 +165,7 @@ const EditItemModal = ({
                 </FormItem>
               )}
             />
-            <FormField
+            <Controller
               control={form.control}
               name="price"
               render={({ field }: { field: any }) => (
@@ -143,7 +183,7 @@ const EditItemModal = ({
                 </FormItem>
               )}
             />
-            <FormField
+            <Controller
               control={form.control}
               name="description"
               render={({ field }: { field: any }) => (
@@ -160,10 +200,33 @@ const EditItemModal = ({
                 </FormItem>
               )}
             />
+            <Controller
+              control={form.control}
+              name="image"
+              render={({ field: { value, onChange, ...field } }) => (
+                <FormItem>
+                  <FormLabel>Image</FormLabel>
+                  <FormControl>
+                    <Input
+                      onChange={(event) => {
+                        if (event.target.files) {
+                          onChange(event.target.files[0]);
+                        }
+                      }}
+                      type="file"
+                      accept=".png"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button className="w-full mt-6" type="submit">
+              Save changes
+            </Button>
           </div>
-          <Button className="mt-6 float-right" type="submit">
-            Save changes
-          </Button>
         </form>
       </Form>
     </DialogContent>

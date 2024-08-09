@@ -2,12 +2,14 @@ import Dropdown from "@/components/parts/Dropdown";
 import ItemDropdownContent from "@/components/parts/ItemDropdownContent";
 import { formatPrice } from "@/utils/formatPrice";
 import { ColumnDef } from "@tanstack/react-table";
+import Image from "next/image";
 
 export type Item = {
   name: string;
   code: string;
   description: string;
   price: number;
+  image: string;
 };
 
 export const columns: ColumnDef<Item>[] = [
@@ -31,6 +33,15 @@ export const columns: ColumnDef<Item>[] = [
       const formattedPrice = formatPrice(price);
 
       return formattedPrice;
+    },
+  },
+  {
+    id: "image",
+    header: "Image",
+    cell: ({ row }) => {
+      const itemImage = row.original.image;
+
+      return <Image src={itemImage} width={100} height={100} alt={"item"} />;
     },
   },
   {
