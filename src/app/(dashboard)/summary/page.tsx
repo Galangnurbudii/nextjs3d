@@ -4,10 +4,32 @@ import { calculateCartItem } from "@/actions/admin/itemAction";
 import CartList from "@/components/parts/CartList";
 import ImageResult from "@/components/parts/ImageResult";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { formatPrice } from "@/utils/formatPrice";
 import { useQuery } from "@tanstack/react-query";
 
 const Summary = () => {
+  const dummyState = [
+    { itemName: "BAK 08x820", quantity: 223 },
+    { itemName: "BAK1 1x02", quantity: 50 },
+  ];
+
+  const cartSummary = useQuery({
+    queryKey: ["carts"],
+    queryFn: () => calculateCartItem(dummyState),
+  });
+
+  const calculateTotalPrice = () => {
+    let totalPrice = 0;
+
+    cartSummary.data?.forEach((item) => {
+      totalPrice += item.totalPrice;
+    });
+
+    return totalPrice;
+  };
+
   return (
     <div className="flex p-8">
       <div className="w-2/3 space-y-8 p-4">
@@ -18,7 +40,15 @@ const Summary = () => {
             <TabsTrigger value="resultImage">Gambar</TabsTrigger>
           </TabsList>
           <TabsContent value="cart" className="pt-8">
-            <CartList />
+            {cartSummary.isLoading ? (
+              <div className="space-y-3">
+                <Skeleton className="h-[100px] w-full rounded-xl" />
+                <Skeleton className="h-[100px] w-full rounded-xl" />
+                <Skeleton className="h-[100px] w-full rounded-xl" />
+              </div>
+            ) : (
+              cartSummary.data && <CartList cartSummary={cartSummary.data} />
+            )}
           </TabsContent>
           <TabsContent value="resultImage">
             <ImageResult />
@@ -31,17 +61,16 @@ const Summary = () => {
           src={"/images/wardrobe3.jpg"}
           alt="cart_item"
         />
-        <div className="space-y-6">
-          <div>
-            <h1 className="font-bold text-xl">KOMPLEMENT</h1>
-            <p className="font-normal">Lemari Pakaian, 225x33x212 cm</p>
-            <p className="font-normal">Total Weight 229 kg</p>
+        {cartSummary.isLoading ? (
+          <Skeleton className="h-[30px] w-full rounded-xl" />
+        ) : (
+          <div className="space-y-6">
+            <div className="font-semibold text-2xl flex justify-between">
+              <h1>Total Price</h1>
+              <h1>{formatPrice(calculateTotalPrice())}</h1>
+            </div>
           </div>
-          <div className="font-semibold text-2xl flex justify-between">
-            <h1>Total Price</h1>
-            <h1>Rp. 18.000.000,00</h1>
-          </div>
-        </div>
+        )}
         <Button
           variant="default"
           className="bg-neutral-700 rounded-lg p-5 w-full"
