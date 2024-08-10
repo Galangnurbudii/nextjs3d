@@ -22,13 +22,8 @@ import { Controller, useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addItem, editItem } from "@/actions/admin/itemAction";
 import { toast } from "sonner";
-import {
-  Dispatch,
-  FormEventHandler,
-  ReactEventHandler,
-  SetStateAction,
-  SyntheticEvent,
-} from "react";
+import { Dispatch, SetStateAction, SyntheticEvent } from "react";
+import { convertBase64 } from "@/utils/convertBase64";
 
 const EditItemModal = ({
   item,
@@ -82,43 +77,29 @@ const EditItemModal = ({
     },
   });
 
-  const convertBase64 = async (file: File) => {
-    const base64string = await new Promise((resolve, reject) => {
-      const fileReader = new FileReader();
-      fileReader.readAsDataURL(file);
-
-      fileReader.onload = () => {
-        resolve(fileReader.result);
-      };
-
-      fileReader.onerror = (error) => {
-        reject(error);
-      };
-    }).then((res) => {
-      return res as string;
-    });
-
-    return base64string;
-  };
-
   async function handleSubmit(e: SyntheticEvent) {
     e.preventDefault();
     const formData = form.getValues();
+    let submittedData =
+      typeof formData.image !== "string"
+        ? {
+            name: formData.name,
+            code: formData.code,
+            description: formData.description,
+            price: formData.price,
+            image: await convertBase64(formData.image),
+          }
+        : {
+            name: formData.name,
+            code: formData.code,
+            description: formData.description,
+            price: formData.price,
+          };
 
-    if (typeof formData.image !== "string") {
-      const data = {
-        name: formData.name,
-        code: formData.code,
-        description: formData.description,
-        price: formData.price,
-        image: await convertBase64(formData.image),
-      };
-
-      if (item) {
-        await editItemMutation.mutateAsync(data);
-      } else {
-        await addItemMutation.mutateAsync(data);
-      }
+    if (item) {
+      await editItemMutation.mutateAsync(submittedData);
+    } else {
+      await addItemMutation.mutateAsync(submittedData);
     }
   }
 

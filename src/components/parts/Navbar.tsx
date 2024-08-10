@@ -17,7 +17,7 @@ import {
 import { logoutUser } from "@/actions/authActions";
 import { Button } from "../ui/button";
 import Link from "next/link";
-import { Bed, LogOut, User } from "lucide-react";
+import { Bed, LogOut, Paintbrush, Search, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "../ui/skeleton";
 import { Separator } from "../ui/separator";
@@ -91,6 +91,23 @@ const Navbar = () => {
                     </>
                   )}
 
+                  <DropdownMenuLabel>Menu </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <Link href={"/design-from-scratches/sizing"}>
+                      <DropdownMenuItem>
+                        <Paintbrush className="mr-2 h-4 w-4" />
+                        <span>Design from scratch</span>
+                      </DropdownMenuItem>
+                    </Link>
+                    <Link href={"/browse-inspiration"}>
+                      <DropdownMenuItem>
+                        <Search className="mr-2 h-4 w-4" />
+                        <span>Browse inspiration</span>
+                      </DropdownMenuItem>
+                    </Link>
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => logoutMutation()}>
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Log out</span>

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import Modal from "@/components/parts/Modal";
 import { useState } from "react";
 import EditItemModal from "@/components/parts/ItemModal";
+import { getCurrentUser } from "@/actions/admin/userAction";
 
 const AdminItem = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -18,6 +19,15 @@ const AdminItem = () => {
     queryKey: ["items"],
     queryFn: () => getAllItems(),
   });
+
+  const currentUser = useQuery({
+    queryKey: ["currentUser"],
+    queryFn: () => getCurrentUser(),
+  });
+
+  if (currentUser.isFetched && currentUser.data?.role !== "admin") {
+    return <h1>You're not authorized to access this page</h1>;
+  }
 
   return (
     <>
