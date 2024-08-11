@@ -8,9 +8,35 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import Link from "next/link";
+import { z } from "zod";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const RegisterFormSchema = z
+  .object({
+    name: z.string().min(1, "Name is required"),
+    email: z.string().email("Email format is invalid"),
+    password: z
+      .string()
+      .min(8, "Password length must be 8 character(s) or more"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Password don't match",
+    path: ["confirmPassword"],
+  });
+
+type FormFields = z.infer<typeof RegisterFormSchema>;
 
 const Register = () => {
   const router = useRouter();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<FormFields>({
+    resolver: zodResolver(RegisterFormSchema),
+  });
 
   const registerMutation = useMutation({
     mutationFn: registerUser,
@@ -24,53 +50,69 @@ const Register = () => {
     },
   });
 
-  async function register(formData: FormData) {
+  const onSubmit: SubmitHandler<FormFields> = async (data) => {
     try {
-      const name = formData.get("name")?.toString().trim();
-      const email = formData.get("email")?.toString().trim();
-      const password = formData.get("password")?.toString().trim();
-      const confirmPassword = formData
-        .get("confirmPassword")
-        ?.toString()
-        .trim();
-
-      if (!name || !email || !password || !confirmPassword)
-        throw new Error("Please fill all the field");
-      if (password !== confirmPassword)
-        throw new Error("Password do not match");
-
       await registerMutation.mutateAsync({
-        name: name,
-        email: email,
-        password: password,
+        name: data.name,
+        email: data.email,
+        password: data.password,
       });
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error) {
+      toast.error("Internal server error");
     }
-  }
+  };
 
   return (
     <div className="h-screen w-full flex justify-center items-center">
       <div className="flex flex-col items-center space-y-10 w-1/5 p-8 border-2 rounded-2xl">
         <img src="/images/logo.png" alt="" width={120} height={120} />
 
-        <form action={register} className="space-y-4 w-full text-center">
-          <Input required type="name" placeholder="Name" name="name" />
-          <Input required type="email" placeholder="Email" name="email" />
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-4 w-full text-center"
+        >
+          <Input type="text" placeholder="Name" {...register("name")} />
+          {errors.name && (
+            <div className="text-red-500 text-left text-xs">
+              {errors.name.message}
+            </div>
+          )}
+
+          <Input type="text" placeholder="Email" {...register("email")} />
+          {errors.email && (
+            <div className="text-red-500 text-left text-xs">
+              {errors.email.message}
+            </div>
+          )}
+
           <Input
-            required
             type="password"
             placeholder="Password"
-            name="password"
+            {...register("password")}
           />
+          {errors.password && (
+            <div className="text-red-500 text-left text-xs">
+              {errors.password.message}
+            </div>
+          )}
+
           <Input
-            required
             type="password"
             placeholder="Confirm Password"
-            name="confirmPassword"
+            {...register("confirmPassword")}
           />
-          <Button className="w-full bg-slate-700" type="submit">
-            {registerMutation.isPending ? (
+          {errors.confirmPassword && (
+            <div className="text-red-500 text-left text-xs">
+              {errors.confirmPassword.message}
+            </div>
+          )}
+
+          <Button
+            className="w-full bg-slate-700"
+            type="submit"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
               <div className="gap-2 flex items-center">
                 Processing{" "}
                 <AiOutlineLoading3Quarters className="animate-spin" />
