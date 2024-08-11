@@ -9,7 +9,7 @@ import { columns } from "./columns";
 import { Button } from "@/components/ui/button";
 import Modal from "@/components/parts/Modal";
 import { useState } from "react";
-import EditItemModal from "@/components/parts/ItemModal";
+import ItemModal from "@/components/parts/ItemModal";
 import { getCurrentUser } from "@/actions/admin/userAction";
 
 const AdminItem = () => {
@@ -32,7 +32,7 @@ const AdminItem = () => {
   return (
     <>
       <Modal isOpen={isOpen} setIsOpen={setIsOpen}>
-        <EditItemModal setIsEditOpen={setIsOpen} />
+        <ItemModal setIsEditOpen={setIsOpen} />
       </Modal>
       <div className="p-8 rounded-2xl bg-white border">
         <div className="flex justify-between">

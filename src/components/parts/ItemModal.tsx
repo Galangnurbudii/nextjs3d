@@ -18,14 +18,34 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Controller, useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addItem, editItem } from "@/actions/admin/itemAction";
 import { toast } from "sonner";
-import { Dispatch, SetStateAction, SyntheticEvent } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { convertBase64 } from "@/utils/convertBase64";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-const EditItemModal = ({
+const ItemFormSchema = z.object({
+  name: z.string().min(1, "Item name is required"),
+  code: z.string().min(1, "Item code is required"),
+  description: z.string().min(1, "Item description is required"),
+  price: z.number({ invalid_type_error: "Item price is required" }).min(0),
+  image: z
+    .instanceof(FileList)
+    .optional()
+    .refine((file) => {
+      console.log(file);
+
+      if (file && file?.length !== 0) file[0].type.startsWith("image/");
+      return true;
+    }, "Only images are allowed"),
+});
+
+type FormFields = z.infer<typeof ItemFormSchema>;
+
+const ItemModal = ({
   item,
   setIsEditOpen,
 }: {
@@ -34,21 +54,44 @@ const EditItemModal = ({
 }) => {
   const queryClient = useQueryClient();
 
-  const form = useForm<{
-    name: string;
-    code: string;
-    description: string;
-    price: number;
-    image: File | string;
-  }>({
+  const form = useForm<FormFields>({
     defaultValues: {
       name: item?.name,
       code: item?.code,
       description: item?.description,
       price: item?.price,
-      image: "",
     },
+    resolver: zodResolver(ItemFormSchema),
   });
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = form;
+
+  const onSubmit: SubmitHandler<FormFields> = async (data) => {
+    try {
+      const submittedData = {
+        name: data.name,
+        code: data.code,
+        description: data.description,
+        price: data.price,
+        image:
+          data.image && data.image.length !== 0
+            ? await convertBase64(data.image[0])
+            : undefined,
+      };
+
+      item
+        ? await editItemMutation.mutateAsync(submittedData)
+        : await addItemMutation.mutateAsync(submittedData);
+    } catch (error: any) {
+      console.log(error.message);
+
+      toast.error("Internal server error");
+    }
+  };
 
   const editItemMutation = useMutation({
     mutationFn: editItem,
@@ -69,39 +112,13 @@ const EditItemModal = ({
       if (!data.error) {
         toast.success("Item has been added");
         setIsEditOpen(false);
-        form.reset();
+        reset();
         queryClient.invalidateQueries({ queryKey: ["items"] });
       } else {
         toast.error(data.error);
       }
     },
   });
-
-  async function handleSubmit(e: SyntheticEvent) {
-    e.preventDefault();
-    const formData = form.getValues();
-    let submittedData =
-      typeof formData.image !== "string"
-        ? {
-            name: formData.name,
-            code: formData.code,
-            description: formData.description,
-            price: formData.price,
-            image: await convertBase64(formData.image),
-          }
-        : {
-            name: formData.name,
-            code: formData.code,
-            description: formData.description,
-            price: formData.price,
-          };
-
-    if (item) {
-      await editItemMutation.mutateAsync(submittedData);
-    } else {
-      await addItemMutation.mutateAsync(submittedData);
-    }
-  }
 
   return (
     <DialogContent className="sm:max-w-[500px]">
@@ -114,95 +131,87 @@ const EditItemModal = ({
         </DialogDescription>
       </DialogHeader>
       <Form {...form}>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-3">
-            <Controller
-              control={form.control}
-              name="name"
-              render={({ field }: { field: any }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Item name ..."
-                      disabled={item ? true : false}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+            <FormItem>
+              <FormLabel>Name</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Item name ..."
+                  type="text"
+                  disabled={item ? true : false}
+                  {...register("name")}
+                />
+              </FormControl>
+              {errors.name && (
+                <div className="text-red-500 text-left text-xs">
+                  {errors.name.message}
+                </div>
               )}
-            />
-            <Controller
-              control={form.control}
-              name="code"
-              render={({ field }: { field: any }) => (
-                <FormItem>
-                  <FormLabel>Code</FormLabel>
-                  <FormControl>
-                    <Input required placeholder="Item code ..." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+            </FormItem>
+            <FormItem>
+              <FormLabel>Code</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Item code ..."
+                  type="text"
+                  {...register("code")}
+                />
+              </FormControl>
+              {errors.code && (
+                <div className="text-red-500 text-left text-xs">
+                  {errors.code.message}
+                </div>
               )}
-            />
-            <Controller
-              control={form.control}
-              name="price"
-              render={({ field }: { field: any }) => (
-                <FormItem>
-                  <FormLabel>Price</FormLabel>
-                  <FormControl>
-                    <Input
-                      required
-                      type="number"
-                      placeholder="Item price"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+            </FormItem>
+            <FormItem>
+              <FormLabel>Price</FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  placeholder="Item price"
+                  {...register("price", { valueAsNumber: true })}
+                />
+              </FormControl>
+              {errors.price && (
+                <div className="text-red-500 text-left text-xs">
+                  {errors.price.message}
+                </div>
               )}
-            />
-            <Controller
-              control={form.control}
-              name="description"
-              render={({ field }: { field: any }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      required
-                      placeholder="Item description"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+            </FormItem>
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Item description"
+                  {...register("description")}
+                />
+              </FormControl>
+              {errors.description && (
+                <div className="text-red-500 text-left text-xs">
+                  {errors.description.message}
+                </div>
               )}
-            />
-            <Controller
-              control={form.control}
-              name="image"
-              render={({ field: { value, onChange, ...field } }) => (
-                <FormItem>
-                  <FormLabel>Image</FormLabel>
-                  <FormControl>
-                    <Input
-                      onChange={(event) => {
-                        if (event.target.files) {
-                          onChange(event.target.files[0]);
-                        }
-                      }}
-                      type="file"
-                      accept=".png"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+            </FormItem>
+            <FormItem>
+              <FormLabel>Image</FormLabel>
+              <FormControl>
+                <Input
+                  // onChange={(event) => {
+                  //   if (event.target.files) {
+                  //     onChange(event.target.files[0]);
+                  //   }
+                  // }}
+                  type="file"
+                  {...register("image")}
+                />
+              </FormControl>
+              {errors.image && (
+                <div className="text-red-500 text-left text-xs">
+                  {errors.image.message}
+                </div>
               )}
-            />
+            </FormItem>
 
             <Button className="w-full mt-6" type="submit">
               Save changes
@@ -214,4 +223,4 @@ const EditItemModal = ({
   );
 };
 
-export default EditItemModal;
+export default ItemModal;
