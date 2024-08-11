@@ -29,9 +29,6 @@ export async function middleware(request: NextRequest) {
 
   if (isProtectedRoutes) {
     const currentSession = await getCurrentSession();
-    // const currentUser = currentSession
-    //   ? await getUserByEmail({ email: currentSession?.email })
-    //   : null;
 
     if (
       currentRoute.startsWith("/_next") ||
@@ -65,7 +62,3 @@ export async function middleware(request: NextRequest) {
 
   return await updateExpiredCurrentSession();
 }
-
-export const config = {
-  matcher: protectedRoutes,
-};

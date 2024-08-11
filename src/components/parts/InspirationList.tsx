@@ -1,6 +1,7 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
+import Image from "next/image";
 
 export const InspirationList = () => {
   return (
@@ -8,8 +9,9 @@ export const InspirationList = () => {
       <Link href="#" className="w-1/3 p-4">
         <Card className="relative">
           <CardContent className="rounded-xl h-72">
-            <img
-              className="object-cover rounded-md w-full h-full"
+            <Image
+              className="rounded-md"
+              fill
               src="/images/wardrobe.jpg"
               alt=""
             />
@@ -26,8 +28,9 @@ export const InspirationList = () => {
       >
         <Card className="relative">
           <CardContent className="rounded-xl h-72">
-            <img
-              className="object-cover rounded-md w-full h-full"
+            <Image
+              className="rounded-md"
+              fill
               src="/images/wardrobe4.jpg"
               alt=""
             />

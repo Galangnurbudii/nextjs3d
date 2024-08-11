@@ -19,7 +19,7 @@ const UserAdmin = () => {
   });
 
   if (currentUser.isFetched && currentUser.data?.role !== "admin") {
-    return <h1>You're not authorized to access this page</h1>;
+    return <h1>You&apos;re not authorized to access this page</h1>;
   }
 
   return (

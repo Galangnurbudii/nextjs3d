@@ -7,6 +7,7 @@ import {
 
 import { MdInfoOutline } from "react-icons/md";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 type ItemProps = {
   image: string;
@@ -33,7 +34,7 @@ const Item = ({ image, name, price, information }: ItemProps) => {
             </TooltipTrigger>
             <TooltipContent>
               <div className="w-[150px] p-1">
-                <img className="rounded-md mb-2" src={image} alt="" />
+                <Image fill className="rounded-md mb-2" src={image} alt="" />
                 <p className="text-xs text-neutral-600 font-semibold">{name}</p>
                 <p className="text-xs text-neutral-400">{information}</p>
                 <h1 className="text-md text-neutral-600">{`Rp. ${price},00`}</h1>

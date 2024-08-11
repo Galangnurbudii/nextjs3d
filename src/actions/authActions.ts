@@ -56,10 +56,7 @@ export async function loginUser({
     if (!isPasswordMatch) return { result: false, error: "Incorrect password" };
 
     await loginAuth({
-      id: user.id,
-      name: user.name,
       email: user.email,
-      role: user.role,
     });
 
     return { result: true };
