@@ -1,6 +1,5 @@
 "use server";
 
-import { Item } from "@/app/(dashboard)/admin/item/columns";
 import { db } from "@/db/db";
 import { item, lower } from "@/db/schema";
 import { and, asc, eq, ne } from "drizzle-orm";

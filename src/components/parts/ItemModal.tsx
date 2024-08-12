@@ -26,6 +26,7 @@ import { Dispatch, SetStateAction } from "react";
 import { convertBase64 } from "@/utils/convertBase64";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 const ItemFormSchema = z.object({
   name: z.string().min(1, "Item name is required"),
@@ -36,10 +37,7 @@ const ItemFormSchema = z.object({
     .instanceof(FileList)
     .optional()
     .refine((file) => {
-      console.log(file);
-
-      if (file && file?.length !== 0) file[0].type.startsWith("image/");
-      return true;
+      if (file && file?.length !== 0) return file[0].type.startsWith("image/");
     }, "Only images are allowed"),
 });
 
@@ -196,15 +194,7 @@ const ItemModal = ({
             <FormItem>
               <FormLabel>Image</FormLabel>
               <FormControl>
-                <Input
-                  // onChange={(event) => {
-                  //   if (event.target.files) {
-                  //     onChange(event.target.files[0]);
-                  //   }
-                  // }}
-                  type="file"
-                  {...register("image")}
-                />
+                <Input type="file" {...register("image")} />
               </FormControl>
               {errors.image && (
                 <div className="text-red-500 text-left text-xs">
@@ -213,8 +203,19 @@ const ItemModal = ({
               )}
             </FormItem>
 
-            <Button className="w-full mt-6" type="submit">
-              Save changes
+            <Button
+              className="w-full mt-6"
+              type="submit"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <div className="gap-2 flex items-center">
+                  {"Saving ..."}
+                  <AiOutlineLoading3Quarters className="animate-spin" />
+                </div>
+              ) : (
+                "Save changes"
+              )}
             </Button>
           </div>
         </form>

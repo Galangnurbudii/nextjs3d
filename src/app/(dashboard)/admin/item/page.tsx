@@ -51,11 +51,7 @@ const AdminItem = () => {
         <div>
           {items.isLoading ? (
             <div className="space-y-4">
-              <div className="flex justify-between">
-                <Skeleton className="h-10 w-[150px]" />
-                <Skeleton className="h-10 w-[150px]" />
-              </div>
-
+              <Skeleton className="h-8 w-[250px]" />
               <Skeleton className="h-8 w-full" />
               <Skeleton className="h-8 w-full" />
               <Skeleton className="h-8 w-full" />
