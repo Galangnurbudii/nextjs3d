@@ -12,6 +12,8 @@ export const metadata = {
   ambalan: ['Ambalan'],
 };
 
+export const key = 'BAK_040X38X104'
+
 export function Model({ handle = '', pintu = '', ambalan = '' }) {
   const { nodes, materials } = useGLTF('/BAK 040X38X104.glb');
   return (

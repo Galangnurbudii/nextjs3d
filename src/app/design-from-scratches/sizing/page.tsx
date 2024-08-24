@@ -1,3 +1,4 @@
+'use client'
 import { Input } from '@/components/ui/input';
 import { TbArrowAutofitHeight, TbArrowAutofitWidth } from 'react-icons/tb';
 import { CgArrowsExpandLeft } from 'react-icons/cg';

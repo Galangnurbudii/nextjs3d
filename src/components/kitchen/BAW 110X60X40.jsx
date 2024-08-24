@@ -10,6 +10,8 @@ export const metadata = {
   pintu: ['CR_11', 'CR_12', 'CR_13'],
 };
 
+export const key = 'BAW_110X60X40';
+
 export function Model({ pintu = '' }) {
   const { nodes, materials } = useGLTF('/BAW 110X60X40.glb');
   return (

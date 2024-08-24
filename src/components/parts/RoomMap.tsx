@@ -1,13 +1,35 @@
 'use client';
 import { useStore } from '@/app/store';
-import { DragControls, Helper, OrbitControls, Select } from '@react-three/drei';
+import { getModelByKey } from '@/lib/utils';
+import {
+  DragControls,
+  Helper,
+  OrbitControls,
+  PivotControls,
+  Select,
+} from '@react-three/drei';
+import {
+  Physics,
+  RapierRigidBody,
+  RigidBody,
+  RigidBodyProps,
+  RigidBodyTypeString,
+  useFixedJoint,
+} from '@react-three/rapier';
 import { Canvas, useLoader } from '@react-three/fiber';
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import {
+  ReactNode,
+  RefObject,
+  Suspense,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import * as THREE from 'three';
 import { TextureLoader } from 'three';
 
-const getMetadata = (mesh: THREE.Object3D): THREE.Object3D | null => {
+const getParent = (mesh: THREE.Object3D): THREE.Object3D | null => {
   if (!mesh) return null;
   if (Object.keys(mesh.userData)[0] === 'furniture_id') {
     return mesh;
@@ -15,7 +37,7 @@ const getMetadata = (mesh: THREE.Object3D): THREE.Object3D | null => {
   if (!mesh.parent) return null;
 
   if (mesh.parent instanceof THREE.Object3D) {
-    return getMetadata(mesh.parent);
+    return getParent(mesh.parent);
   }
 
   return null;
@@ -23,8 +45,8 @@ const getMetadata = (mesh: THREE.Object3D): THREE.Object3D | null => {
 
 const RoomMap = () => {
   const router = useRouter();
-  const furnitures = useStore((state: any) => state.furnitures);
-  console.log(furnitures);
+  const furnitures = useStore((state) => state.furnitures);
+  const updatePosition = useStore((state) => state.updatePosition);
 
   const repeat = 3;
   const plaster = useLoader(TextureLoader, [
@@ -34,12 +56,6 @@ const RoomMap = () => {
     '/textures/plaster/Plaster_002_ROUGH.jpg',
     '/textures/plaster/Plaster_002_OCC.jpg',
   ]);
-  plaster.map((item) => {
-    item.wrapS = THREE.RepeatWrapping;
-    item.wrapT = THREE.RepeatWrapping;
-    item.repeat.set(repeat, repeat);
-  });
-
   const wood = useLoader(TextureLoader, [
     '/textures/wood/Wood_Floor_012_basecolor.jpg',
     '/textures/wood/Wood_Floor_012_height.png',
@@ -47,150 +63,185 @@ const RoomMap = () => {
     '/textures/wood/Wood_Floor_012_roughness.jpg',
     '/textures/wood/Wood_Floor_012_ambientOcclusion.jpg',
   ]);
+
+  const firstLoad = useRef<boolean>(true);
+  useEffect(() => {
+    if (firstLoad.current) {
+      firstLoad.current = false;
+    }
+  }, []);
   wood.map((item) => {
     item.wrapS = THREE.RepeatWrapping;
     item.wrapT = THREE.RepeatWrapping;
     item.repeat.set(repeat, repeat);
   });
-  const [selected, setSelected] = useState<any[]>([]);
-  const [currentPosition, setCurrentPosition] = useState<number>(0);
-  const [nextPosition, setNextPosition] = useState<number>(currentPosition);
+  plaster.map((item) => {
+    item.wrapS = THREE.RepeatWrapping;
+    item.wrapT = THREE.RepeatWrapping;
+    item.repeat.set(repeat, repeat);
+  });
 
+  const [selected, setSelected] = useState<number>();
   const handleSelect = (meshs: THREE.Object3D[]) => {
-    const parent = getMetadata(meshs[0]);
+    const parent = getParent(meshs[0]);
     if (!parent) {
+      setSelected(undefined);
       router.push('/design-from-scratches/frame');
       return;
     }
+
+    setSelected(parent.userData.furniture_id);
+
     router.push(
       `/design-from-scratches/menu?index=${parent.userData.furniture_id}`
     );
-    console.log(furnitures);
     return;
   };
-
-  const [positions, setPositions] = useState<number[]>([]);
   const meshesRef = useRef<(THREE.Mesh | null)[]>([]);
-
-  useEffect(() => {
-    const calculatePositions = () => {
-      let accumulatedX = 0;
-      const newPositions = furnitures.map((item: any, index: number) => {
-        let currentWidth = 0;
-        if (meshesRef.current[index]) {
-          const bbox = new THREE.Box3().setFromObject(
-            meshesRef.current[index] as THREE.Object3D
-          );
-          const bboxSize = new THREE.Vector3();
-          currentWidth = bbox.getSize(bboxSize).x;
-        }
-        const position = accumulatedX;
-        accumulatedX += currentWidth;
-        return position;
-      });
-      setPositions(newPositions);
-    };
-
-    calculatePositions();
-  }, [furnitures]);
-
+  const boxesRef = useRef<(THREE.Box3 | null)[]>([]);
   const setMeshRef = (index: number) => (el: THREE.Mesh | null) => {
     meshesRef.current[index] = el;
+    boxesRef.current[index] = new THREE.Box3(
+      new THREE.Vector3(),
+      new THREE.Vector3()
+    );
   };
 
   const [isOrbitEnabled, setIsOrbitEnabled] = useState<boolean>(true);
 
   return (
     <Canvas camera={{ position: [50, 50, 200] }} shadows className='rounded-lg'>
-      <ambientLight intensity={4} position={[0, 0, 0]} />
-      <directionalLight
-        castShadow
-        position={[20, 50, 10]}
-        intensity={6}
-        color={'#ffffff'}
-      />
-      <directionalLight position={[-50, 0, -25]} intensity={2} />
-      {/* <axesHelper args={[200]} /> */}
-      <color attach='background' args={['#949494']} />
+      <Suspense>
+        <ambientLight intensity={4} position={[0, 0, 0]} />
+        <directionalLight
+          castShadow
+          position={[20, 50, 10]}
+          intensity={6}
+          color={'#ffffff'}
+        />
+        <directionalLight position={[-50, 0, -25]} intensity={2} />
+        {/* <axesHelper args={[200]} /> */}
+        <color attach='background' args={['#949494']} />
 
-      <mesh>
-        <Select box onChangePointerUp={handleSelect} filter={(items) => items}>
-          {furnitures.map((item: any, index: number) => (
-            <DragControls
-              key={index}
-              axisLock='y'
-              dragLimits={[[-50, 100], [0,0], [0,100]]}
-              onDragStart={() => {
-                setIsOrbitEnabled(false);
-              }}
-              onDragEnd={() => {
-                setIsOrbitEnabled(true);
-              }}
+        <Physics debug gravity={[0, -10, 0]}>
+          <mesh>
+            <Select
+              multiple={false}
+              box
+              onChangePointerUp={handleSelect}
+              filter={(items) => items}
             >
+              {furnitures.map((item, index) => {
+                const Model = getModelByKey(item.key);
+                return (
+                  <DragControls
+                    key={index}
+                    axisLock='z'
+                    // dragLimits={[
+                    //   [-50, 100],
+                    //   [0, 0],
+                    //   [0, 100],
+                    // ]}
+                    onDrag={(a, b, c, d) => {
+                      boxesRef.current[index]?.applyMatrix4(a);
+
+                      if (index === 1) {
+                        if (
+                          boxesRef.current[1]?.intersectsBox(
+                            boxesRef.current[0]!
+                          )
+                        )
+                          console.log('tabrakan bro');
+                      }
+                    }}
+                    onDragStart={(a) => {
+                      boxesRef.current[index]?.setFromObject(
+                        meshesRef.current[index]!
+                      );
+                      setIsOrbitEnabled(false);
+                    }}
+                    onDragEnd={() => {
+                      setIsOrbitEnabled(true);
+                      let newPos = new THREE.Vector3();
+                      meshesRef.current[index]?.getWorldPosition(newPos);
+                      updatePosition(index, [newPos.x, newPos.y, newPos.z]);
+                    }}
+                  >
+                    <RigidBody key={index}>
+                      <mesh
+                        ref={setMeshRef(index)}
+                        userData={{ furniture_id: index }}
+                        position={
+                          firstLoad.current ? item.position : [0, 0, 100]
+                        }
+                      >
+                        <Model.Model {...item.customization} />
+                      </mesh>
+                      {selected === index && (
+                        <Helper type={THREE.BoxHelper} args={['royalblue']} />
+                      )}
+                    </RigidBody>
+                  </DragControls>
+                );
+              })}
+            </Select>
+            <RigidBody type='fixed'>
               <mesh
-                ref={setMeshRef(index)}
-                userData={{ furniture_id: index }}
-                position={[positions[index] || 0, 0, 100]}
+                position={[200, 250, 0]}
+                rotation={[0, 0, 0]}
+                scale={[500, 500, 500]}
               >
-                <item.Model {...item.customization} />
+                <planeGeometry />
+                <meshStandardMaterial
+                  displacementScale={0}
+                  map={plaster[0]}
+                  displacementMap={plaster[1]}
+                  normalMap={plaster[2]}
+                  roughnessMap={plaster[3]}
+                  aoMap={plaster[4]}
+                />
               </mesh>
-            </DragControls>
-          ))}
-        </Select>
-        <mesh
-          position={[200, 250, 0]}
-          rotation={[0, 0, 0]}
-          scale={[500, 500, 500]}
-        >
-          <planeGeometry />
+              <mesh
+                position={[-50, 250, 250]}
+                rotation={[0, Math.PI / 2, 0]}
+                scale={[500, 500, 500]}
+              >
+                <planeGeometry />
 
-          <meshStandardMaterial
-            displacementScale={0}
-            map={plaster[0]}
-            displacementMap={plaster[1]}
-            normalMap={plaster[2]}
-            roughnessMap={plaster[3]}
-            aoMap={plaster[4]}
-          />
-        </mesh>
-        <mesh
-          position={[-50, 250, 250]}
-          rotation={[0, Math.PI / 2, 0]}
-          scale={[500, 500, 500]}
-        >
-          <planeGeometry />
+                <meshStandardMaterial
+                  displacementScale={0}
+                  map={plaster[0]}
+                  displacementMap={plaster[1]}
+                  normalMap={plaster[2]}
+                  roughnessMap={plaster[3]}
+                  aoMap={plaster[4]}
+                />
+              </mesh>
+              <mesh
+                receiveShadow
+                position={[200, 0, 250]}
+                rotation={[-Math.PI / 2, 0, 0]}
+                scale={[500, 500, 500]}
+              >
+                <planeGeometry />
 
-          <meshStandardMaterial
-            displacementScale={0}
-            map={plaster[0]}
-            displacementMap={plaster[1]}
-            normalMap={plaster[2]}
-            roughnessMap={plaster[3]}
-            aoMap={plaster[4]}
-          />
-        </mesh>
-        <mesh
-          receiveShadow
-          position={[200, 0, 250]}
-          rotation={[-Math.PI / 2, 0, 0]}
-          scale={[500, 500, 500]}
-        >
-          <planeGeometry />
-
-          <meshStandardMaterial
-            displacementScale={0}
-            map={wood[0]}
-            displacementMap={wood[1]}
-            normalMap={wood[2]}
-            roughnessMap={wood[3]}
-            aoMap={wood[4]}
-          />
-        </mesh>
-      </mesh>
-
-      <OrbitControls enabled={isOrbitEnabled} />
+                <meshStandardMaterial
+                  displacementScale={0}
+                  map={wood[0]}
+                  displacementMap={wood[1]}
+                  normalMap={wood[2]}
+                  roughnessMap={wood[3]}
+                  aoMap={wood[4]}
+                />
+              </mesh>
+            </RigidBody>
+          </mesh>
+        </Physics>
+        <OrbitControls enabled={isOrbitEnabled} />
+      </Suspense>
     </Canvas>
   );
 };
 
 export default RoomMap;
+

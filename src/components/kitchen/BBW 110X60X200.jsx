@@ -9,7 +9,7 @@ import { useGLTF } from '@react-three/drei';
 export const metadata = {
   pintu: ['CR11', 'CR12', 'CR13'],
 };
-
+export const key = 'BBW_110X60X200'
 export function Model({ pintu = '' }) {
   const { nodes, materials } = useGLTF('/BBW 110X60X200.glb');
   return (

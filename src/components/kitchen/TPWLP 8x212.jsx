@@ -9,7 +9,7 @@ import { useGLTF } from '@react-three/drei';
 export const metadata = {
   kaki: ['CB_4', 'CB_1', 'CB_2', 'CB_8'],
 };
-
+export const key = 'TPWLP_8x212';
 export function Model({ kaki = '' }) {
   const { nodes, materials } = useGLTF('/TPWLP 8x212.glb');
   return (

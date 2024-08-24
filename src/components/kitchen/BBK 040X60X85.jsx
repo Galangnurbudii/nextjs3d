@@ -14,6 +14,8 @@ export const metadata = {
   ambalan: ['Ambalan_1', 'Ambalan_2'],
 };
 
+export const key = 'BBK_040X60X85'
+
 export function Model({
   kaki = '',
   handle = '',

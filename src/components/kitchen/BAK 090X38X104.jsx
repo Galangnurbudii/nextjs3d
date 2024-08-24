@@ -12,6 +12,8 @@ export const metadata = {
   isian: ['appliances_piring', 'Ambalan'],
 };
 
+export const key = 'BAK_090X38X104';
+
 export function Model({ handle = '', pintu = '', isian = '' }) {
   const { nodes, materials } = useGLTF('/BAK 090X38X104.glb');
   return (

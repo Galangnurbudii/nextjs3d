@@ -12,6 +12,8 @@ export const metadata = {
   handle: ['Handle_5__Knob_', 'Handle_4', 'Handle_3', 'Handle_2', 'Handle_1'],
 };
 
+export const key = 'BAK_090X38X40'
+
 export function Model({ pintu = '', isian = '', handle = '' }) {
   const { nodes, materials } = useGLTF('/BAK 090X38X40.glb');
   return (

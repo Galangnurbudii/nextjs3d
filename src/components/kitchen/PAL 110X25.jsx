@@ -7,7 +7,7 @@ import React from 'react';
 import { useGLTF } from '@react-three/drei';
 
 export const metadata = {};
-
+export const key = 'PAL_110X25';
 export function Model() {
   const { nodes, materials } = useGLTF('/PAL 110X25.glb');
   return (

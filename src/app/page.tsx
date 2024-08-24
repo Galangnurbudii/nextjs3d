@@ -1,3 +1,4 @@
+'use client'
 import ImageCarousel from "@/components/parts/ImageCarousel";
 import ImageGrid from "@/components/parts/ImageGrid";
 import Menu from "@/components/parts/Menu";

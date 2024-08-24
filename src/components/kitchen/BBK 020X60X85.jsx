@@ -13,6 +13,8 @@ export const metadata = {
   isian: ['Appliances_botol'],
 };
 
+export const key = 'BBK_020X60X85'
+
 export function Model({ plint = '', handle = '', pintu = '', isian = '' }) {
   const { nodes, materials } = useGLTF('/BBK 020X60X85.glb');
   return (

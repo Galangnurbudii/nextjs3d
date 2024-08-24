@@ -7,7 +7,7 @@ import React from 'react';
 import { useGLTF } from '@react-three/drei';
 
 export const metadata = {};
-
+export const key = 'TPKR_8x40';
 export function Model() {
   const { nodes, materials } = useGLTF('/TPKR 8x40.glb');
   return (

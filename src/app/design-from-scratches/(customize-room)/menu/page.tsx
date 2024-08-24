@@ -7,6 +7,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { getModelByKey } from '@/lib/utils';
 
 const CustomizeMenu = ({
   searchParams,
@@ -15,21 +16,19 @@ const CustomizeMenu = ({
     index: string;
   };
 }) => {
-  const furnitures = useStore((state: any) => state.furnitures);
-  const updateState = useStore((state: any) => state.updateCustomization);
+  const furnitures = useStore((state) => state.furnitures);
+  const updateState = useStore((state) => state.updateCustomization);
 
   const handleCustomization = (value: string) => {
     const parseVal = JSON.parse(value);
-
-    // console.log(typeof updateState);
 
     updateState(parseInt(searchParams.index), {
       [parseVal.key]: parseVal.value,
     });
   };
 
-  const metadata = furnitures[parseInt(searchParams.index)].metadata;
-
+  const metadata = getModelByKey(furnitures[parseInt(searchParams.index)].key).metadata;
+  const customization = furnitures[parseInt(searchParams.index)].customization;
   return (
     <>
       <h1 className='font-semibold text-xl text-neutral-700'>
@@ -41,7 +40,22 @@ const CustomizeMenu = ({
             <AccordionItem value={item} key={index}>
               <AccordionTrigger>{item}</AccordionTrigger>
               <AccordionContent>
-                <ToggleGroup onValueChange={handleCustomization} type='single'>
+                <ToggleGroup
+                  value={JSON.stringify({
+                    key: item,
+                    value: (customization as Record<string, string>)[item],
+                  })}
+                  onValueChange={(value) => {
+                    if (!value) {
+                      handleCustomization(
+                        JSON.stringify({ key: item, value: '' })
+                      );
+                    } else {
+                      handleCustomization(value);
+                    }
+                  }}
+                  type='single'
+                >
                   {(metadata[item as keyof typeof metadata] as string[]).map(
                     (item2, index2) => (
                       <ToggleGroupItem

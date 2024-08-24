@@ -12,6 +12,8 @@ export const metadata = {
   isian: ['Ambalan'],
 };
 
+export const key = 'BAK_040X38X40';
+
 export function Model({ handle = '', pintu = '', isian = '' }) {
   const { nodes, materials } = useGLTF('/BAK 040X38X40.glb');
   return (
@@ -146,7 +148,7 @@ export function Model({ handle = '', pintu = '', isian = '' }) {
               />
             </group>
             <group
-              visible={(handle === 'Handle_4')}
+              visible={handle === 'Handle_4'}
               userData={{ name: 'Handle_4' }}
             >
               <group userData={{ name: 'Group1' }}>

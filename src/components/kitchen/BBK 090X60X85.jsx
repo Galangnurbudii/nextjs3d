@@ -23,6 +23,8 @@ export const metadata = {
   plint: ['CB4', 'CB2', 'CB8', 'CB1'],
 };
 
+export const key = 'BBK_090X60X85'
+
 export function Model({ plint = '', isian = '', pintu = '', handle = '' }) {
   const { nodes, materials } = useGLTF('/BBK 090X60X85.glb');
   return (

@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "../ui/button";
 import Link from "next/link";
+import Image from 'next/image';
 
 const Menu = () => {
   return (
@@ -17,7 +18,7 @@ const Menu = () => {
       <div className="flex justify-center gap-4">
         <Card className="w-full p-2">
           <CardContent className="rounded-xl h-72">
-            <img
+            <Image
               className="object-cover rounded-md w-full h-full"
               src="/images/wardrobe5.jpg"
               alt=""
@@ -33,7 +34,7 @@ const Menu = () => {
         </Card>
         <Card className="w-full p-2">
           <CardContent className="rounded-xl h-72">
-            <img
+            <Image
               className="object-cover rounded-t-md w-full h-full"
               src="/images/wardrobe6.jpg"
               alt=""
@@ -49,7 +50,7 @@ const Menu = () => {
         </Card>
         <Card className="w-full p-2">
           <CardContent className="rounded-xl h-72">
-            <img
+            <Image
               className="object-cover rounded-t-md w-full h-full"
               src="/images/wardrobe2.jpg"
               alt=""
