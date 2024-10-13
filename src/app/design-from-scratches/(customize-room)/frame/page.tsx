@@ -20,7 +20,7 @@ const Frame = (props: Props) => {
   const furnitures = useStore((state) => state.furnitures);
   const handleClick = (key: string) => {
     pushItem({
-      position: [0, 0, 100],
+      position: [0, 0, 0],
       key: key,
       customization: Object.keys(getModelByKey(key).metadata).reduce<
         Record<string, string>

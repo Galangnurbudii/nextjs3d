@@ -2,25 +2,17 @@
 import { useStore } from '@/app/store';
 import { getModelByKey } from '@/lib/utils';
 import {
-  DragControls,
-  Helper,
   OrbitControls,
   PivotControls,
   Select,
 } from '@react-three/drei';
 import {
   Physics,
-  RapierRigidBody,
   RigidBody,
-  RigidBodyProps,
-  RigidBodyTypeString,
-  useFixedJoint,
 } from '@react-three/rapier';
 import { Canvas, useLoader } from '@react-three/fiber';
 import { useRouter } from 'next/navigation';
 import {
-  ReactNode,
-  RefObject,
   Suspense,
   useEffect,
   useRef,
@@ -28,6 +20,7 @@ import {
 } from 'react';
 import * as THREE from 'three';
 import { TextureLoader } from 'three';
+import { Movable } from './Movable';
 
 const getParent = (mesh: THREE.Object3D): THREE.Object3D | null => {
   if (!mesh) return null;
@@ -46,7 +39,6 @@ const getParent = (mesh: THREE.Object3D): THREE.Object3D | null => {
 const RoomMap = () => {
   const router = useRouter();
   const furnitures = useStore((state) => state.furnitures);
-  const updatePosition = useStore((state) => state.updatePosition);
 
   const repeat = 3;
   const plaster = useLoader(TextureLoader, [
@@ -97,6 +89,7 @@ const RoomMap = () => {
     );
     return;
   };
+
   const meshesRef = useRef<(THREE.Mesh | null)[]>([]);
   const boxesRef = useRef<(THREE.Box3 | null)[]>([]);
   const setMeshRef = (index: number) => (el: THREE.Mesh | null) => {
@@ -110,7 +103,7 @@ const RoomMap = () => {
   const [isOrbitEnabled, setIsOrbitEnabled] = useState<boolean>(true);
 
   return (
-    <Canvas camera={{ position: [50, 50, 200] }} shadows className='rounded-lg'>
+    <Canvas camera={{ position: [50, 50, 200] }} shadows  className='rounded-lg'>
       <Suspense>
         <ambientLight intensity={4} position={[0, 0, 0]} />
         <directionalLight
@@ -119,11 +112,11 @@ const RoomMap = () => {
           intensity={6}
           color={'#ffffff'}
         />
+        <SpotLightComponent />
         <directionalLight position={[-50, 0, -25]} intensity={2} />
         {/* <axesHelper args={[200]} /> */}
         <color attach='background' args={['#949494']} />
-
-        <Physics debug gravity={[0, -10, 0]}>
+        <Physics debug timeStep='vary'>
           <mesh>
             <Select
               multiple={false}
@@ -134,97 +127,65 @@ const RoomMap = () => {
               {furnitures.map((item, index) => {
                 const Model = getModelByKey(item.key);
                 return (
-                  <DragControls
-                    key={index}
-                    axisLock='z'
-                    // dragLimits={[
-                    //   [-50, 100],
-                    //   [0, 0],
-                    //   [0, 100],
-                    // ]}
-                    onDrag={(a, b, c, d) => {
-                      boxesRef.current[index]?.applyMatrix4(a);
-
-                      if (index === 1) {
-                        if (
-                          boxesRef.current[1]?.intersectsBox(
-                            boxesRef.current[0]!
-                          )
-                        )
-                          console.log('tabrakan bro');
-                      }
-                    }}
-                    onDragStart={(a) => {
-                      boxesRef.current[index]?.setFromObject(
-                        meshesRef.current[index]!
-                      );
-                      setIsOrbitEnabled(false);
-                    }}
-                    onDragEnd={() => {
-                      setIsOrbitEnabled(true);
-                      let newPos = new THREE.Vector3();
-                      meshesRef.current[index]?.getWorldPosition(newPos);
-                      updatePosition(index, [newPos.x, newPos.y, newPos.z]);
-                    }}
+                  <Movable
+                    index={index}
+                    isSelected={selected === index}
+                    key={item.key + index}
+                    position={firstLoad.current ? item.position : undefined}
+                    setIsOrbitEnabled={setIsOrbitEnabled}
                   >
-                    <RigidBody key={index}>
-                      <mesh
-                        ref={setMeshRef(index)}
-                        userData={{ furniture_id: index }}
-                        position={
-                          firstLoad.current ? item.position : [0, 0, 100]
-                        }
-                      >
-                        <Model.Model {...item.customization} />
-                      </mesh>
-                      {selected === index && (
-                        <Helper type={THREE.BoxHelper} args={['royalblue']} />
-                      )}
-                    </RigidBody>
-                  </DragControls>
+                    <mesh
+                      castShadow
+                      receiveShadow
+                      ref={setMeshRef(index)}
+                      userData={{ furniture_id: index }}
+                    >
+                      <Model.Model {...item.customization} />
+                    </mesh>
+                  </Movable>
                 );
               })}
             </Select>
-            <RigidBody type='fixed'>
+            <RigidBody colliders='hull' type='fixed'>
               <mesh
-                position={[200, 250, 0]}
-                rotation={[0, 0, 0]}
-                scale={[500, 500, 500]}
-              >
-                <planeGeometry />
-                <meshStandardMaterial
-                  displacementScale={0}
-                  map={plaster[0]}
-                  displacementMap={plaster[1]}
-                  normalMap={plaster[2]}
-                  roughnessMap={plaster[3]}
-                  aoMap={plaster[4]}
-                />
-              </mesh>
-              <mesh
-                position={[-50, 250, 250]}
-                rotation={[0, Math.PI / 2, 0]}
-                scale={[500, 500, 500]}
-              >
-                <planeGeometry />
-
-                <meshStandardMaterial
-                  displacementScale={0}
-                  map={plaster[0]}
-                  displacementMap={plaster[1]}
-                  normalMap={plaster[2]}
-                  roughnessMap={plaster[3]}
-                  aoMap={plaster[4]}
-                />
-              </mesh>
-              <mesh
+                castShadow
                 receiveShadow
-                position={[200, 0, 250]}
-                rotation={[-Math.PI / 2, 0, 0]}
-                scale={[500, 500, 500]}
+                position={[200, 250, -250]}
+                rotation={[0, 0, 0]}
               >
-                <planeGeometry />
-
+                <boxGeometry args={[500, 500, 10]} />
+                <meshStandardMaterial
+                  displacementScale={0}
+                  map={plaster[0]}
+                  displacementMap={plaster[1]}
+                  normalMap={plaster[2]}
+                  roughnessMap={plaster[3]}
+                  aoMap={plaster[4]}
+                />
+              </mesh>
+              <mesh
+                castShadow
+                receiveShadow
+                position={[-50, 250, 0]}
+                rotation={[0, Math.PI / 2, 0]}
+              >
+                <boxGeometry args={[500, 500, 10]} />
+                <meshStandardMaterial
+                  displacementScale={0}
+                  map={plaster[0]}
+                  displacementMap={plaster[1]}
+                  normalMap={plaster[2]}
+                  roughnessMap={plaster[3]}
+                  aoMap={plaster[4]}
+                />
+              </mesh>
+              <mesh
+                castShadow
+                receiveShadow
+                position={[200, -6, 0]}
+                rotation={[-Math.PI / 2, 0, 0]}
+              >
+                <boxGeometry args={[500, 500, 10]} />
                 <meshStandardMaterial
                   displacementScale={0}
                   map={wood[0]}
@@ -245,3 +206,18 @@ const RoomMap = () => {
 
 export default RoomMap;
 
+const SpotLightComponent = () => {
+  const stopLightRef = useRef<THREE.SpotLight>(null!);
+  // useHelper(stopLightRef, THREE.SpotLightHelper, 'cyan');
+  return (
+    <spotLight
+      ref={stopLightRef}
+      position={[300, 200, 0]}
+      angle={0.5}
+      penumbra={1}
+      decay={0}
+      intensity={Math.PI * 5}
+      castShadow
+    />
+  );
+};
